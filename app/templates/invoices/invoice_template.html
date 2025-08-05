@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: DejaVu Sans; direction: rtl; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid black; padding: 5px; text-align: center; }
+    </style>
+</head>
+<body>
+    <h2>فاکتور سفارش شماره {{ order.order_number }}</h2>
+    <p>نام کاربر: {{ user.get_full_name }}</p>
+    <p>تاریخ: {{ invoice.created_at|date:"Y/m/d" }}</p>
+    <hr>
+    <table>
+        <thead>
+            <tr>
+                <th>محصول</th>
+                <th>تعداد</th>
+                <th>قیمت واحد</th>
+                <th>قیمت کل</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in order.items.all %}
+            <tr>
+                <td>{{ item.title_snapshot }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.unit_price }}</td>
+                <td>{{ item.total_price }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <hr>
+    <p>مبلغ کل: {{ invoice.total_amount }} تومان</p>
+</body>
+</html>

@@ -1,0 +1,2 @@
+from .ImageAssetViews import ImageAssetViewSet
+from .VideoAssetViews import VideoAssetViewSet
