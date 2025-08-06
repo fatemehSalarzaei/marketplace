@@ -24,6 +24,7 @@ import {
   DollarSign,
   Ticket,
   LayoutDashboard,
+  Bell, // اضافه شده برای مدیریت اعلان‌ها
 } from "lucide-react";
 
 export default function AdminSidebarMenu() {
@@ -88,6 +89,14 @@ export default function AdminSidebarMenu() {
       ],
     },
     {
+      label: "مدیریت اعلان‌ها",
+      icon: Bell,
+      key: "notifications",
+      children: [
+        { label: "لیست اعلان‌ها", href: "/admin/notifications" },
+      ],
+    },
+    {
       label: "حمل‌ونقل و پرداخت",
       icon: Truck,
       key: "shipping",
@@ -111,7 +120,6 @@ export default function AdminSidebarMenu() {
       icon: Ticket,
       key: "support",
       children: [
-       
         { label: " نظرات کاربران", href: "/admin/support/reviews" },
         { label: "لیست تیکت‌ها", href: "/admin/support/tickets" },
         { label: "دسته‌بندی پشتیبانی", href: "/admin/support/categories" },

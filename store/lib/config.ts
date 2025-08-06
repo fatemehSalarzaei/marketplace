@@ -58,7 +58,9 @@ export const API_ENDPOINTS_ADMIN = {
   change_order : `${API_BASE_URL}/orders/admin/update-order-status/`,
   returns_order : `${API_BASE_URL}/orders/admin/returns/`,
   payment_gateways : `${API_BASE_URL}/payments/admin/payment-gateways/`,
+  notifications : `${API_BASE_URL}/notifications/admin/notifications/`,
 
 
+  
   
 };

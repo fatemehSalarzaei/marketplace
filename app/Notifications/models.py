@@ -28,4 +28,4 @@ class Notification(models.Model):
     scheduled_at = models.DateTimeField(null=True, blank=True)  # برای ارسال با تاخیر
 
     def __str__(self):
-        return f"{self.user.username} - {self.title} ({self.channel})"
+        return f"{self.user.phonr_number} - {self.title} ({self.channel})"
