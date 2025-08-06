@@ -11,11 +11,13 @@ interface Props {
 }
 
 const statusMap: Record<string, string> = {
-  pending: 'در انتظار',
+  pending: 'در انتظار پرداخت',
+  paid: 'پرداخت‌شده',
   processing: 'در حال پردازش',
-  shipped: 'ارسال شده',
+  shipped: 'ارسال‌شده',
   delivered: 'تحویل داده شده',
-  cancelled: 'لغو شده',
+  canceled: 'لغو شده',
+  cancelled: 'لغو شده',  // برای اطمینان از تطابق با دو حالت
 }
 
 export default function OrderGeneralInfo({ order, onStatusUpdated }: Props) {
@@ -34,12 +36,15 @@ export default function OrderGeneralInfo({ order, onStatusUpdated }: Props) {
     switch (status) {
       case 'pending':
         return <Loader className="w-5 h-5 text-yellow-500 inline-block ml-2" />
+      case 'paid':
+        return <CheckCircle className="w-5 h-5 text-green-500 inline-block ml-2" />
       case 'processing':
         return <PackageCheck className="w-5 h-5 text-blue-500 inline-block ml-2" />
       case 'shipped':
         return <PackageCheck className="w-5 h-5 text-blue-500 inline-block ml-2" />
       case 'delivered':
         return <CheckCircle className="w-5 h-5 text-green-500 inline-block ml-2" />
+      case 'canceled':
       case 'cancelled':
         return <XCircle className="w-5 h-5 text-red-500 inline-block ml-2" />
       default:
@@ -65,12 +70,13 @@ export default function OrderGeneralInfo({ order, onStatusUpdated }: Props) {
             {order.is_paid ? 'بله' : 'خیر'}
           </span>
         </div>
+        <div><span className="font-medium">شیوه ارسال:</span> {order.shipping_method.name || '—'}</div>
         <div className="col-span-full">
           <span className="font-medium">تاریخ ثبت سفارش:</span> {new Date(order.created_at).toLocaleString('fa-IR')}
         </div>
       </div>
 
-      {order.status !== 'delivered' && order.status !== 'cancelled' && (
+      {order.status !== 'delivered' && order.status !== 'canceled' && order.status !== 'cancelled' && (
         <div className="pt-4">
           <button
             onClick={handleOpenModal}

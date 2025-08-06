@@ -9,11 +9,12 @@ interface Props {
 }
 
 const statusMap: Record<string, string> = {
-  pending: 'در انتظار',
+  pending: 'در انتظار پرداخت',
+  paid: 'پرداخت‌شده',
   processing: 'در حال پردازش',
-  shipped: 'ارسال شده',
+  shipped: 'ارسال‌شده',
   delivered: 'تحویل داده شده',
-  cancelled: 'لغو شده',
+  canceled: 'لغو شده',
 };
 
 const OrderStatusHistory: React.FC<Props> = ({ statusHistory }) => {

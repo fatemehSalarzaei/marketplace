@@ -19,9 +19,15 @@ class Order(models.Model):
 
     order_number = models.CharField(max_length=20, unique=True, blank=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='orders')
-    # address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True)
+    shipping_method = models.ForeignKey(
+        'Shipping.ShippingMethod',  # اگر اپ و مدل ShippingMethod در اپ Shipping است
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='orders'
+    )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    coupon = models.ForeignKey(DiscountCode, null=True, blank=True, on_delete=models.SET_NULL)
+    coupon = models.ForeignKey('Discounts.DiscountCode', null=True, blank=True, on_delete=models.SET_NULL)
     total_price = models.DecimalField(max_digits=12, decimal_places=2)
     final_price = models.DecimalField(max_digits=12, decimal_places=2)
     delivery_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)

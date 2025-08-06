@@ -22,33 +22,31 @@ class UserSerializer(serializers.ModelSerializer):
         return f"{obj.first_name} {obj.last_name}".strip()
 
 
+
 class ProductSerializer(serializers.ModelSerializer):
-    main_image = serializers.SerializerMethodField()
+    main_image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'slug', 'main_image']
+        fields = ['id', 'name', 'slug', 'main_image_url']
 
-    def get_main_image(self, obj):
-        request = self.context.get("request")
-        if obj.main_image and hasattr(obj.main_image, 'url'):
-            return request.build_absolute_uri(obj.main_image.url)
+    def get_main_image_url(self, obj):
+        request = self.context.get('request')
+        if obj.main_image and hasattr(obj.main_image, 'file') and obj.main_image.file:
+            url = obj.main_image.file.url
+            if request is not None:
+                return request.build_absolute_uri(url)
+            return url
         return None
 
 
 class VariantSerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField()
     product = ProductSerializer(read_only=True)
 
     class Meta:
         model = ProductVariant
-        fields = ['id', 'sku', 'price', 'stock', 'is_active', 'image', 'product']
+        fields = ['id', 'sku', 'price', 'stock', 'is_active', 'product']
 
-    def get_image(self, obj):
-        request = self.context.get("request")
-        if obj.image and hasattr(obj.image, 'url'):
-            return request.build_absolute_uri(obj.image.url)
-        return None
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
@@ -114,6 +112,10 @@ class ShippingAddressSerializer(serializers.ModelSerializer):
             'street_address', 'postal_code', 'phone_number'
         ]
 
+class ShippingMethodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ShippingMethod
+        fields = ['id', 'name', 'description', 'cost']
 
 class AdminOrderDetailSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)  # اضافه کردن اطلاعات کاربر
@@ -122,12 +124,14 @@ class AdminOrderDetailSerializer(serializers.ModelSerializer):
     invoice = InvoiceSerializer(read_only=True)
     shipment = ShipmentSerializer(read_only=True)
     shipping_address = ShippingAddressSerializer(read_only=True)
+    shipping_method = ShippingMethodSerializer(read_only=True)  # اضافه کردن شیوه ارسال
+
 
     class Meta:
         model = Order
         fields = [
             'id', 'order_number', 'status', 'total_price', 'final_price',
-            'delivery_price', 'is_paid', 'created_at',
+            'delivery_price', 'is_paid', 'created_at','shipping_method',
             'user',  # اضافه شده
             'items', 'status_history', 'invoice', 'shipment', 'shipping_address'
         ]

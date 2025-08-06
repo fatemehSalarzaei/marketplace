@@ -32,16 +32,46 @@ export default function VariantManager() {
     })
   }
 
-  const updateAttribute = (variantIndex: number, attrIndex: number, key: 'attribute' | 'attribute_value', value: string) => {
+  // تابع آپدیت کردن attribute / predefined_value / value
+  const updateAttribute = (
+    variantIndex: number,
+    attrIndex: number,
+    key: 'attribute' | 'predefined_value' | 'value',
+    value: string
+  ) => {
     const current = watch(`variants.${variantIndex}.variant_attributes`) || []
     const updated = [...current]
-    updated[attrIndex] = { ...updated[attrIndex], [key]: value }
+
+    if (key === 'attribute') {
+      updated[attrIndex] = {
+        ...updated[attrIndex],
+        attribute: value === '' ? null : Number(value),
+        predefined_value: null,
+        value: '',
+      }
+    } else if (key === 'predefined_value') {
+      updated[attrIndex] = {
+        ...updated[attrIndex],
+        predefined_value: value === '' ? null : Number(value),
+        value: '',
+      }
+    } else if (key === 'value') {
+      updated[attrIndex] = {
+        ...updated[attrIndex],
+        value: value,
+        predefined_value: null,
+      }
+    }
+
     setValue(`variants.${variantIndex}.variant_attributes`, updated)
   }
 
   const addAttributeToVariant = (variantIndex: number) => {
     const current = watch(`variants.${variantIndex}.variant_attributes`) || []
-    setValue(`variants.${variantIndex}.variant_attributes`, [...current, { attribute: '', attribute_value: '' }])
+    setValue(`variants.${variantIndex}.variant_attributes`, [
+      ...current,
+      { attribute: null, predefined_value: null, value: '' },
+    ])
   }
 
   const removeAttributeFromVariant = (variantIndex: number, attrIndex: number) => {
@@ -62,12 +92,11 @@ export default function VariantManager() {
         const selectedAttrs = watch(`variants.${index}.variant_attributes`) || []
 
         return (
-          <div key={variant.id} className="border rounded p-4 space-y-4">
+          <div key={variant.id ?? variant.key ?? index} className="border rounded p-4 space-y-4">
             <div>
               <label>SKU</label>
               <input
-                {...register(`variants.${index}.sku` as const)}
-                defaultValue={variant.sku}
+                {...register(`variants.${index}.sku` as const, { required: true })}
                 className="input"
               />
             </div>
@@ -75,8 +104,7 @@ export default function VariantManager() {
               <label>قیمت</label>
               <input
                 type="number"
-                {...register(`variants.${index}.price` as const, { valueAsNumber: true })}
-                defaultValue={variant.price}
+                {...register(`variants.${index}.price` as const, { valueAsNumber: true, min: 0 })}
                 className="input"
               />
             </div>
@@ -84,8 +112,7 @@ export default function VariantManager() {
               <label>موجودی</label>
               <input
                 type="number"
-                {...register(`variants.${index}.stock` as const, { valueAsNumber: true })}
-                defaultValue={variant.stock}
+                {...register(`variants.${index}.stock` as const, { valueAsNumber: true, min: 0 })}
                 className="input"
               />
             </div>
@@ -98,17 +125,17 @@ export default function VariantManager() {
               />
             </div>
 
-            {/* Variant Attributes */}
+            {/* مدیریت خصوصیات تنوع */}
             <div className="space-y-2">
               <label className="block">خصوصیات تنوع</label>
               {selectedAttrs.map((attr, attrIndex) => {
                 const attrDef = variantAttributes.find(a => a.id === Number(attr.attribute))
 
                 return (
-                  <div key={attrIndex} className="flex flex-wrap items-center gap-2">
+                  <div key={attr.attribute ?? attrIndex} className="flex flex-wrap items-center gap-2">
                     <select
                       className="input"
-                      value={attr.attribute}
+                      value={attr.attribute ?? ''}
                       onChange={e =>
                         updateAttribute(index, attrIndex, 'attribute', e.target.value)
                       }
@@ -124,18 +151,18 @@ export default function VariantManager() {
                         <input
                           type="text"
                           className="input"
-                          value={attr.attribute_value}
+                          value={attr.value || ''}
                           onChange={e =>
-                            updateAttribute(index, attrIndex, 'attribute_value', e.target.value)
+                            updateAttribute(index, attrIndex, 'value', e.target.value)
                           }
                           placeholder="مقدار دلخواه"
                         />
                       ) : (
                         <select
                           className="input"
-                          value={attr.attribute_value}
+                          value={attr.predefined_value ?? ''}
                           onChange={e =>
-                            updateAttribute(index, attrIndex, 'attribute_value', e.target.value)
+                            updateAttribute(index, attrIndex, 'predefined_value', e.target.value)
                           }
                         >
                           <option value="">انتخاب مقدار</option>

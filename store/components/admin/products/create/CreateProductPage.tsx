@@ -17,13 +17,13 @@ import { Product } from '@/types/admin/products/products_save'
 
 interface GalleryImage {
   id?: number
-  image_asset: string
+  image_asset: number | string
   alt_text?: string
 }
 
 interface ProductVideo {
   id?: number
-  video_asset: string
+  video_asset: number | string
   title?: string
   description?: string
 }
@@ -35,47 +35,65 @@ interface Props {
 export default function ProductForm({ product }: Props) {
   const router = useRouter()
 
-  // مقداردهی اولیه دقیق با استخراج id ها و مقداردهی فیلدها
   const defaultValues = product
     ? {
         ...product,
-        brand: product.brand?.id || null,
-        category: product.category?.id || null,
-        status: product.status || '',
+        brand: product.brand?.id ? String(product.brand.id) : '',
+        category: product.category?.id ? String(product.category.id) : '',
+        status: product.status ?? '',
         is_active: product.is_active ?? true,
-        attribute_values: product.attribute_values || [],
-        variants: product.variants || [],
+        attribute_values: product.attributes?.map(attr => ({
+          id: attr.id,
+          attribute: attr.attribute,
+          value: attr.value,
+          predefined_value: attr.predefined_value
+        })) ?? [],
+        // اینجا مهمه: تبدیل attributes به variant_attributes
+        variants: product.variants?.map(v => ({
+          ...v,
+          variant_attributes: v.attributes || [],
+        })) ?? [],
       }
     : {
         attribute_values: [],
         variants: [],
         is_active: true,
         status: '',
-        brand: null,
-        category: null,
+        brand: '',
+        category: '',
       }
 
-  const methods = useForm({
-    defaultValues,
-  })
-
+  const methods = useForm({ defaultValues })
   const { handleSubmit, reset } = methods
+
   const [categories, setCategories] = useState<{ id: number; name: string }[]>([])
   const [brands, setBrands] = useState<{ id: number; name: string }[]>([])
   const [mainImage, setMainImage] = useState<GalleryImage | null>(
     product?.main_image
       ? {
           id: product.main_image.id,
-          image_asset:
-            typeof product.main_image === 'string'
-              ? product.main_image
-              : product.main_image.image_asset || '',
+          image_asset: product.main_image.image_url,
           alt_text: product.main_image.alt_text || '',
         }
       : null
   )
-  const [gallery, setGallery] = useState<GalleryImage[]>(product?.gallery_images || [])
-  const [video, setVideo] = useState<ProductVideo | null>(product?.videos?.[0] || null)
+  const [gallery, setGallery] = useState<GalleryImage[]>(
+    product?.gallery_images?.map(img => ({
+      id: img.image_id,
+      image_asset: img.image_url,
+      alt_text: img.alt_text || '',
+    })) || []
+  )
+  const [video, setVideo] = useState<ProductVideo | null>(
+    product?.videos?.[0]
+      ? {
+          id: product.videos[0].video_id,
+          video_asset: product.videos[0].video_url,
+          title: product.videos[0].title || '',
+          description: product.videos[0].description || '',
+        }
+      : null
+  )
 
   useEffect(() => {
     const fetchData = async () => {
@@ -88,12 +106,21 @@ export default function ProductForm({ product }: Props) {
       if (product) {
         reset({
           ...defaultValues,
-          brand: product.brand?.id || null,
-          category: product.category?.id || null,
-          status: product.status || '',
+          brand: product.brand?.id ? String(product.brand.id) : '',
+          category: product.category?.id ? String(product.category.id) : '',
+          status: product.status ?? '',
           is_active: product.is_active ?? true,
-          attribute_values: product.attribute_values || [],
-          variants: product.variants || [],
+          attribute_values: product.attributes?.map(attr => ({
+            id: attr.id,
+            attribute: attr.attribute,
+            value: attr.value,
+            predefined_value: attr.predefined_value
+          })) ?? [],
+          // اینجا هم تبدیل attributes به variant_attributes هنگام ریست کردن فرم
+          variants: product.variants?.map(v => ({
+            ...v,
+            variant_attributes: v.attributes || [],
+          })) ?? [],
         })
       }
     }
@@ -106,9 +133,10 @@ export default function ProductForm({ product }: Props) {
         ...data,
         slug: data.slug?.trim() || null,
         category: Number(data.category),
+        brand: Number(data.brand),
         is_active: data.is_active ?? true,
         tags: data.tags ?? [],
-        main_image: mainImage?.id || null,
+        main_image_id: mainImage?.id || null,
         gallery_images:
           gallery.length > 0
             ? gallery.map((img) => ({
@@ -125,20 +153,22 @@ export default function ProductForm({ product }: Props) {
               },
             ]
           : [],
+        attribute_values: [],
         variants: [],
       }
 
-      // attribute_values
       if (data.attribute_values && data.attribute_values.length > 0) {
         payload.attribute_values = data.attribute_values.map((attr: any) => ({
           id: attr.id,
-          attribute: attr.attribute,
-          predefined_value: attr.predefined_value,
-          value: attr.value,
+          attribute: Number(attr.attribute),
+          predefined_value:
+            attr.predefined_value !== null && attr.predefined_value !== undefined
+              ? Number(attr.predefined_value)
+              : null,
+          value: attr.value || '',
         }))
       }
 
-      // variants
       if (data.variants && data.variants.length > 0) {
         payload.variants = data.variants.map((variant: any) => {
           const v: any = {
@@ -147,12 +177,8 @@ export default function ProductForm({ product }: Props) {
             price: Number(variant.price),
             stock: Number(variant.stock ?? 0),
             is_active: !!variant.is_active,
-            variant_attributes: [],
             gallery_images: [],
-          }
-
-          if (typeof variant.image === 'string') {
-            v.image = variant.image
+            variant_attributes: [],
           }
 
           if (variant.gallery_images && variant.gallery_images.length > 0) {
@@ -172,8 +198,12 @@ export default function ProductForm({ product }: Props) {
 
           if (variant.variant_attributes && variant.variant_attributes.length > 0) {
             v.variant_attributes = variant.variant_attributes.map((attr: any) => ({
-              id: attr.id,
-              attribute_value: attr.attribute_value,
+              attribute: Number(attr.attribute),
+              predefined_value:
+                attr.predefined_value !== null && attr.predefined_value !== undefined
+                  ? Number(attr.predefined_value)
+                  : null,
+              value: attr.value || null,
             }))
           }
 

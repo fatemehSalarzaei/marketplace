@@ -35,7 +35,14 @@ class Product(models.Model):
         choices=AVAILABILITY_CHOICES,
         default='in_stock',
     )
-    main_image = models.ImageField(upload_to='products/main_images/', null=True, blank=True)
+    # main_image = models.ImageField(upload_to='products/main_images/', null=True, blank=True)
+    
+    main_image = models.ForeignKey(
+        ImageAsset,
+        on_delete=models.CASCADE,
+        null=True,
+        # blank=True
+    )
     min_order_quantity = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
     max_order_quantity = models.PositiveIntegerField(default=1000)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -44,8 +51,6 @@ class Product(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
-        if self.main_image:
-            self.main_image = compress_image(self.main_image)
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -82,11 +87,12 @@ class ProductVideo(models.Model):
 
 class ProductVariant(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variants')
-    sku = models.CharField(max_length=100, unique=True)
+    # sku = models.CharField(max_length=100, unique=True)
+    sku = models.CharField(max_length=100)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)    
-    image = models.ImageField(upload_to='product_variants/', null=True, blank=True)
+    # image = models.ImageField(upload_to='product_variants/', null=True, blank=True)
     low_stock_threshold = models.PositiveIntegerField(default=5)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -102,8 +108,6 @@ class ProductVariant(models.Model):
             old = ProductVariant.objects.get(pk=self.pk)
             low_stock_before = old.stock <= old.low_stock_threshold
 
-        if self.image:
-            self.image = compress_image(self.image)
         super().save(*args, **kwargs)
         
     # بررسی کاهش موجودی
@@ -161,13 +165,20 @@ class ProductAttributeValue(models.Model):
 
 class ProductVariantAttribute(models.Model):
     product_variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE, related_name="variant_attributes")
-    attribute_value = models.ForeignKey('Attributes.AttributeValue', on_delete=models.CASCADE)
+    attribute = models.ForeignKey('Attributes.Attribute', on_delete=models.CASCADE, related_name='variant_values' )
+   
+    predefined_value = models.ForeignKey(
+        'Attributes.AttributeValue',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='variant_attribute_values'
+    )
+    value = models.CharField(max_length=255, blank=True, null=True)
 
-    class Meta:
-        unique_together = ('product_variant', 'attribute_value')
+    # class Meta:
+    #     unique_together = ('product_variant', 'attribute')
 
-    def __str__(self):
-        return f"{self.product_variant} - {self.attribute_value}"
 class StockAlert(models.Model):
     variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE, related_name='stock_alerts')
     triggered_at = models.DateTimeField(auto_now_add=True)

@@ -1,29 +1,21 @@
+// ProductBasicInfo.tsx
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { getBrands } from '@/services/admin/brands/brandService'
-import ProductDescriptionsForm from './ProductDescriptionsForm'
 
 interface Props {
   categories: { id: number; name: string }[]
+  brands: { id: number; name: string }[]
   errors: any
   register: any
   isEdit: boolean
 }
 
-export default function ProductBasicInfo({ categories, errors, register, isEdit }: Props) {
-  const [brands, setBrands] = useState<{ id: number; name: string }[]>([])
-
+export default function ProductBasicInfo({ categories, brands, errors, register, isEdit }: Props) {
   useEffect(() => {
     register('short_description')
     register('long_description')
   }, [register])
-
-  useEffect(() => {
-    getBrands({ is_active: 'true' }).then((data) => {
-      setBrands(data.results || [])
-    })
-  }, [])
 
   return (
     <div className="space-y-6">
@@ -32,8 +24,11 @@ export default function ProductBasicInfo({ categories, errors, register, isEdit 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* نام محصول */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">نام محصول</label>
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+            نام محصول
+          </label>
           <input
+            id="name"
             {...register('name', { required: 'نام محصول الزامی است' })}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             type="text"
@@ -43,8 +38,11 @@ export default function ProductBasicInfo({ categories, errors, register, isEdit 
 
         {/* کد محصول */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">کد محصول</label>
+          <label htmlFor="product_code" className="block text-sm font-medium text-gray-700 mb-1">
+            کد محصول
+          </label>
           <input
+            id="product_code"
             {...register('product_code', { required: 'کد محصول الزامی است' })}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             type="text"
@@ -56,8 +54,11 @@ export default function ProductBasicInfo({ categories, errors, register, isEdit 
 
         {/* اسلاگ */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">اسلاگ (اختیاری)</label>
+          <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-1">
+            اسلاگ (اختیاری)
+          </label>
           <input
+            id="slug"
             {...register('slug')}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             type="text"
@@ -67,8 +68,11 @@ export default function ProductBasicInfo({ categories, errors, register, isEdit 
 
         {/* وضعیت */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">وضعیت</label>
+          <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
+            وضعیت
+          </label>
           <select
+            id="status"
             {...register('status', { required: 'وضعیت الزامی است' })}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
@@ -82,13 +86,17 @@ export default function ProductBasicInfo({ categories, errors, register, isEdit 
       </div>
 
       {/* ویرایشگر توضیحات کوتاه و کامل */}
-      <ProductDescriptionsForm />
+      {/* فرضا این کامپوننت در جای دیگری هست */}
+      {/* <ProductDescriptionsForm /> */}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* وضعیت موجودی */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">وضعیت موجودی</label>
+          <label htmlFor="availability_status" className="block text-sm font-medium text-gray-700 mb-1">
+            وضعیت موجودی
+          </label>
           <select
+            id="availability_status"
             {...register('availability_status', { required: 'وضعیت موجودی الزامی است' })}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
@@ -104,8 +112,11 @@ export default function ProductBasicInfo({ categories, errors, register, isEdit 
 
         {/* حداقل مقدار سفارش */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">حداقل مقدار سفارش</label>
+          <label htmlFor="min_order_quantity" className="block text-sm font-medium text-gray-700 mb-1">
+            حداقل مقدار سفارش
+          </label>
           <input
+            id="min_order_quantity"
             {...register('min_order_quantity', {
               required: 'حداقل مقدار سفارش الزامی است',
               valueAsNumber: true,
@@ -122,8 +133,11 @@ export default function ProductBasicInfo({ categories, errors, register, isEdit 
 
         {/* حداکثر مقدار سفارش */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">حداکثر مقدار سفارش</label>
+          <label htmlFor="max_order_quantity" className="block text-sm font-medium text-gray-700 mb-1">
+            حداکثر مقدار سفارش
+          </label>
           <input
+            id="max_order_quantity"
             {...register('max_order_quantity', {
               required: 'حداکثر مقدار سفارش الزامی است',
               valueAsNumber: true,
@@ -140,8 +154,11 @@ export default function ProductBasicInfo({ categories, errors, register, isEdit 
 
         {/* برند */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">برند</label>
+          <label htmlFor="brand" className="block text-sm font-medium text-gray-700 mb-1">
+            برند
+          </label>
           <select
+            id="brand"
             {...register('brand', {
               required: 'انتخاب برند الزامی است',
               setValueAs: (v) => (v === '' ? null : Number(v)),
@@ -150,7 +167,7 @@ export default function ProductBasicInfo({ categories, errors, register, isEdit 
           >
             <option value="">انتخاب کنید</option>
             {brands.map((brand) => (
-              <option key={brand.id} value={brand.id}>
+              <option key={brand.id} value={String(brand.id)}>
                 {brand.name}
               </option>
             ))}
@@ -160,8 +177,11 @@ export default function ProductBasicInfo({ categories, errors, register, isEdit 
 
         {/* دسته‌بندی */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">دسته‌بندی</label>
+          <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+            دسته‌بندی
+          </label>
           <select
+            id="category"
             {...register('category', {
               required: 'دسته‌بندی الزامی است',
               setValueAs: (v) => (v === '' ? null : Number(v)),
@@ -170,7 +190,7 @@ export default function ProductBasicInfo({ categories, errors, register, isEdit 
           >
             <option value="">انتخاب کنید</option>
             {categories.map((c) => (
-              <option key={c.id} value={c.id}>
+              <option key={c.id} value={String(c.id)}>
                 {c.name}
               </option>
             ))}

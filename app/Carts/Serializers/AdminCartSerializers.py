@@ -18,7 +18,7 @@ class ProductVariantSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductVariant
-        fields = ['id', 'sku', 'price', 'stock', 'image', 'product']
+        fields = ['id', 'sku', 'price', 'stock', 'product']
 
 class AdminUserSerializer(serializers.ModelSerializer):
     class Meta:

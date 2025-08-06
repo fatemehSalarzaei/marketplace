@@ -53,6 +53,7 @@ export default function AttributeSelector() {
       updated[index] = {
         ...updated[index],
         [key]: value === '' ? null : parseInt(value as string, 10),
+        ...(key === 'attribute' ? { predefined_value: null, value: '' } : {}),
       }
     } else {
       updated[index] = {
@@ -97,7 +98,6 @@ export default function AttributeSelector() {
 
         return (
           <div key={index} className="flex flex-wrap items-center gap-2 w-full">
-            {/* Attribute selection */}
             <select
               className="input flex-1"
               value={attr.attribute ?? ''}
@@ -112,7 +112,6 @@ export default function AttributeSelector() {
               ))}
             </select>
 
-            {/* Attribute value */}
             {attrDef ? (
               attrDef.use_predefined_values ? (
                 <select
@@ -149,7 +148,6 @@ export default function AttributeSelector() {
               />
             )}
 
-            {/* Buttons */}
             {isEditing ? (
               <button type="button" onClick={() => saveAttribute(index)} className="btn-primary">
                 ذخیره
@@ -168,7 +166,6 @@ export default function AttributeSelector() {
               حذف
             </button>
 
-            {/* Error message */}
             {error && <p className="text-red-500 text-sm w-full">{error}</p>}
           </div>
         )
