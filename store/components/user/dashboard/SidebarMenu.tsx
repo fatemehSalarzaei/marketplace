@@ -34,10 +34,9 @@ export default function SidebarMenu() {
   const menuItems = [
     { label: "خلاصه فعالیت‌ها", href: "/user", icon: "🏠" },
     { label: "سفارش‌ها", href: "/user/orders", icon: "📦" },
-    { label: "لیست‌های من", href: "/user/lists", icon: "📋" },
+    { label: "لیست‌های علاقه مندی ", href: "/user/favorites", icon: "📋" },
     { label: "دیدگاه‌ها و پرسش‌ها", href: "/user/comments", icon: "💬" },
     { label: "آدرس‌ها", href: "/user/addresses", icon: "🏠" },
-    { label: "کارت‌های هدیه", href: "/user/gift-cards", icon: "🎁" },
     { label: "پیام‌ها", href: "/user/notification", icon: "🔔" },
     { label: "بازدید‌های اخیر", href: "/user/user-history", icon: "🕒" },
     { label: "اطلاعات حساب کاربری", href: "/user/personal-info", icon: "👤" },

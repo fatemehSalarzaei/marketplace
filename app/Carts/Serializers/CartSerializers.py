@@ -18,18 +18,18 @@ class ProductSerializer(serializers.ModelSerializer):
 
 # Variant Serializer
 class ProductVariantSerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField()
+    # image = serializers.SerializerMethodField()
     product = ProductSerializer(read_only=True)
 
     class Meta:
         model = ProductVariant
-        fields = ['id', 'sku', 'price', 'stock', 'image', 'product']
+        fields = ['id', 'sku', 'price', 'stock', 'product']
 
-    def get_image(self, obj):
-        request = self.context.get("request")
-        if obj.image and hasattr(obj.image, 'url'):
-            return request.build_absolute_uri(obj.image.url)
-        return None
+    # def get_image(self, obj):
+    #     request = self.context.get("request")
+    #     if obj.image and hasattr(obj.image, 'url'):
+    #         return request.build_absolute_uri(obj.image.url)
+    #     return None
 
 # Cart Item Serializer
 class CartItemSerializer(serializers.ModelSerializer):

@@ -9,10 +9,14 @@ class ProductBasicSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'name', 'slug', 'short_description', 'main_image_url']
-
     def get_main_image_url(self, obj):
-        return obj.main_image.image_url if obj.main_image else None
-
+        request = self.context.get('request')
+        if obj.main_image:
+            image_url = obj.main_image.image.url
+            if request:
+                return request.build_absolute_uri(image_url)
+            return image_url
+        return None
 
 class ProductVariantBasicSerializer(serializers.ModelSerializer):
     product = ProductBasicSerializer()
