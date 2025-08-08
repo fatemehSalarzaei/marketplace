@@ -37,7 +37,7 @@ export default function SidebarMenu() {
     { label: "لیست‌های علاقه مندی ", href: "/user/favorites", icon: "📋" },
     { label: "دیدگاه‌ها و پرسش‌ها", href: "/user/reviews", icon: "💬" },
     { label: "آدرس‌ها", href: "/user/addresses", icon: "🏠" },
-    { label: "پیام‌ها", href: "/user/notification", icon: "🔔" },
+    { label: "پیام‌ها", href: "/user/notifications", icon: "🔔" },
     { label: "بازدید‌های اخیر", href: "/user/user-history", icon: "🕒" },
     { label: "اطلاعات حساب کاربری", href: "/user/personal-info", icon: "👤" },
     { label: "خروج", href: "/logout", icon: "🚪", isLogout: true },

@@ -30,7 +30,8 @@ export const API_ENDPOINTS = {
   remove_from_favorites: `${API_BASE_URL}/favorites/favorites/remove/`,
   check_favorite: "/favorites/check/",
   getReviews: `${API_BASE_URL}/reviews/reviews/`, 
-    submitReview: `${API_BASE_URL}/reviews/reviews/create/`
+  submitReview: `${API_BASE_URL}/reviews/reviews/create/`,
+  userNotifications: `${API_BASE_URL}/notifications/user/notifications/`,
 };
 
 export const API_ENDPOINTS_ADMIN = {

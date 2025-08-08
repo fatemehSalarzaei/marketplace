@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action 
 
 from Notifications.models import Notification
+from django.db.models import Q
 from Notifications.Serializers import NotificationSerializer
 
 
@@ -15,8 +16,9 @@ class UserNotificationListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated] 
 
     def get_queryset(self):
-        
-        return Notification.objects.filter(user=self.request.user).order_by('-created_at')
+        return Notification.objects.filter(
+            Q(user=self.request.user) | Q(user__isnull=True)
+        ).order_by('-created_at')
 
 class UserNotificationDetailView(generics.RetrieveUpdateAPIView):
    
@@ -24,7 +26,9 @@ class UserNotificationDetailView(generics.RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Notification.objects.filter(user=self.request.user)
+        return Notification.objects.filter(
+            Q(user=self.request.user) | Q(user__isnull=True)
+        ).order_by('-created_at')
     
     @action(detail=True, methods=['patch', 'post'], url_path='mark-as-read')
     def mark_as_read(self, request, *args, **kwargs):
