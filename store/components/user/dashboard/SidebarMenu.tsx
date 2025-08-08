@@ -35,7 +35,7 @@ export default function SidebarMenu() {
     { label: "خلاصه فعالیت‌ها", href: "/user", icon: "🏠" },
     { label: "سفارش‌ها", href: "/user/orders", icon: "📦" },
     { label: "لیست‌های علاقه مندی ", href: "/user/favorites", icon: "📋" },
-    { label: "دیدگاه‌ها و پرسش‌ها", href: "/user/comments", icon: "💬" },
+    { label: "دیدگاه‌ها و پرسش‌ها", href: "/user/reviews", icon: "💬" },
     { label: "آدرس‌ها", href: "/user/addresses", icon: "🏠" },
     { label: "پیام‌ها", href: "/user/notification", icon: "🔔" },
     { label: "بازدید‌های اخیر", href: "/user/user-history", icon: "🕒" },
