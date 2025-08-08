@@ -1,2 +1,2 @@
-from .FavoriteSerializers import FavoriteSerializer
+from .FavoriteSerializers import FavoriteSerializer , FavoriteListSerializer
 from .FavoriteCheckSerializers import FavoriteCheckSerializer

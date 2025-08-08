@@ -5,16 +5,27 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from Favorites.models import Favorite
-from Favorites.Serializers import FavoriteSerializer
+from Favorites.Serializers import FavoriteSerializer  , FavoriteListSerializer
 
 class FavoriteViewSet(viewsets.ModelViewSet):
     queryset = Favorite.objects.all()
-    serializer_class = FavoriteSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return self.queryset.filter(user=self.request.user)
+        return (
+            self.queryset
+            .filter(user=self.request.user)
+            .select_related(
+                'product', 'product__main_image',
+                'variant', 'variant__product', 'variant__product__main_image'
+            )
+        )
+
+    def get_serializer_class(self):
+        if self.action in ['list', 'retrieve']:
+            return FavoriteListSerializer
+        return FavoriteSerializer
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -31,9 +42,14 @@ class FavoriteViewSet(viewsets.ModelViewSet):
         product = request.data.get('product')
         variant = request.data.get('variant')
         if not product and not variant:
-            return Response({"error": "Either product or variant ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Either product or variant ID is required."},
+                            status=status.HTTP_400_BAD_REQUEST)
         try:
-            favorite = Favorite.objects.get(user=request.user, product_id=product if product else None, variant_id=variant if variant else None)
+            favorite = Favorite.objects.get(
+                user=request.user,
+                product_id=product if product else None,
+                variant_id=variant if variant else None
+            )
             favorite.delete()
             return Response({"status": "Favorite removed successfully."})
         except Favorite.DoesNotExist:
