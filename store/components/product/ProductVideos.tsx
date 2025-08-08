@@ -9,7 +9,11 @@ const ProductVideos = ({ videos }: { videos: ProductVideo[] }) => {
       <h2 className="text-lg font-semibold mb-2">ویدیوها</h2>
       {videos.map((video) => (
         <div key={video.id} className="mb-4">
-          <video controls className="w-full rounded">
+          <video
+            controls
+            className="rounded"
+            style={{ width: "400px", height: "400px" }}
+          >
             <source src={video.video_url} type="video/mp4" />
           </video>
           <p className="text-sm mt-1">{video.title}</p>

@@ -8,3 +8,4 @@ from .PublicProductDetailSerializers import PublicProductDetailSerializer
 from .ProductVideoSerializers import ProductVideoSerializer
 from .ProductSerializers import ProductSerializer
 from .StockAlertSerializers import StockAlertSerializer
+from .ProductDetailAdminSerializers import ProductDetailAdminSerializer

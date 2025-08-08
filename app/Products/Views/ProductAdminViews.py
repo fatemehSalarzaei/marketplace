@@ -64,3 +64,11 @@ class ProductAdminViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(product)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+    @action(detail=True, methods=['get'], url_path='details')
+    def retrieve_details(self, request, pk=None):
+        """دریافت اطلاعات کامل محصول با سریالایزر متفاوت"""
+        product = self.get_object()
+        serializer = ProductDetailAdminSerializer(product, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)

@@ -43,9 +43,10 @@ const ProductTabs = ({ variants, attributes, videos, description }: Props) => {
       </div>
 
       {tab === "description" && (
-        <div className="text-gray-800 leading-relaxed">
-          <p>{description}</p>
-        </div>
+        <div
+          className="text-gray-800 leading-relaxed"
+          dangerouslySetInnerHTML={{ __html: description }}
+        />
       )}
 
       {tab === "specs" && (
