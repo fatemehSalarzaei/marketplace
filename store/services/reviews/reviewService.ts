@@ -13,4 +13,14 @@ export const reviewService = {
 
     return res.data;
   },
+  
+  async submitReview(data: {
+    product: number;
+    rating: number;
+    comment: string;
+    parent?: number | null;
+  }) {
+    const res = await apiClient.post(API_ENDPOINTS.submitReview, data);
+    return res.data;
+  },
 };

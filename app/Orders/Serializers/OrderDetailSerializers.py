@@ -15,8 +15,8 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def get_main_image(self, obj):
         request = self.context.get("request")
-        if obj.main_image and hasattr(obj.main_image, 'url'):
-            return request.build_absolute_uri(obj.main_image.url)
+        if obj.main_image and hasattr(obj.main_image.image, 'url'):
+            return request.build_absolute_uri(obj.main_image.image.url)
         return None
 
 

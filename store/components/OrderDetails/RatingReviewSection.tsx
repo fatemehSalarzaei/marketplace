@@ -1,33 +1,70 @@
 "use client";
 
 import { useState } from "react";
+import { reviewService } from "@/services/reviews/reviewService";
 
-export default function RatingReviewSection() {
+interface RatingReviewSectionProps {
+  productId: number; // شناسه محصول برای ارسال دیدگاه
+  onReviewSubmitted?: () => void; // callback پس از ثبت موفق
+}
+
+export default function RatingReviewSection({ productId, onReviewSubmitted }: RatingReviewSectionProps) {
   const [rating, setRating] = useState<number | null>(null);
   const [review, setReview] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  const handleSubmit = () => {
-    console.log("امتیاز:", rating);
-    console.log("دیدگاه:", review);
-    // اینجا می‌تونی درخواست ارسال به سرور بزنی
+  const handleSubmit = async () => {
+    if (!rating) {
+      setError("لطفا امتیاز دهید.");
+      return;
+    }
+    if (review.trim() === "") {
+      setError("لطفا دیدگاه خود را بنویسید.");
+      return;
+    }
+
+    setError(null);
+    setSuccessMsg(null);
+    setLoading(true);
+
+    try {
+      await reviewService.submitReview({
+        product: productId,
+        rating,
+        comment: review.trim(),
+      });
+      setSuccessMsg("دیدگاه شما با موفقیت ثبت شد.");
+      setRating(null);
+      setReview("");
+      if (onReviewSubmitted) onReviewSubmitted();
+    } catch (err) {
+      setError("خطا در ارسال دیدگاه. لطفا دوباره تلاش کنید.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="flex flex-col lg:flex-row mt-6 gap-4 items-start">
-      {/* امتیازدهی */}
-      <div className="lg:min-w-1/3 lg:max-w-[40%] w-full">
-        <div className="flex items-center justify-between">
+      {/* امتیازدهی و دیدگاه */}
+      <div className="lg:min-w-1/3 lg:max-w-[70%] w-full">
+        <div className="flex items-center justify-between mb-1">
           <p className="text-sm font-semibold">امتیاز دهید!</p>
           <div className="flex gap-3">
             {[1, 2, 3, 4, 5].map((star) => (
               <div key={star} className="flex flex-col items-center">
-                <div className="cursor-pointer" onClick={() => setRating(star)}>
+                <div
+                  className="cursor-pointer"
+                  onClick={() => setRating(star)}
+                  aria-label={`${star} ستاره`}
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
-                    fill={
-                      rating !== null && rating >= star ? "#facc15" : "#d1d5db"
-                    }
+                    fill={rating !== null && rating >= star ? "#facc15" : "#d1d5db"}
                     className="w-6 h-6"
                   >
                     <path
@@ -42,13 +79,28 @@ export default function RatingReviewSection() {
             ))}
           </div>
         </div>
+
+        {/* عنوان دیدگاه */}
+        <label htmlFor="review-text" className="block text-sm font-semibold mb-1">
+          دیدگاه شما
+        </label>
+        <textarea
+          id="review-text"
+          rows={5}
+          value={review}
+          onChange={(e) => setReview(e.target.value)}
+          className="w-full border border-gray-300 rounded-md p-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="دیدگاه خود را اینجا بنویسید..."
+          disabled={loading}
+        />
       </div>
 
       {/* دکمه ثبت دیدگاه */}
-      <div className="flex-grow flex justify-start lg:justify-end w-full">
+      <div className="flex justify-start lg:justify-end w-full lg:w-auto">
         <button
           onClick={handleSubmit}
-          className="flex items-center text-sm border border-blue-600 text-blue-600 rounded px-4 py-1"
+          disabled={loading}
+          className="flex items-center text-sm border border-blue-600 text-blue-600 rounded px-4 py-1 hover:bg-blue-50 disabled:opacity-50"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -58,15 +110,15 @@ export default function RatingReviewSection() {
             stroke="currentColor"
             strokeWidth={1.5}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M7 8h10M7 12h4m1 9l-1-1H6a2 2 0 01-2-2V6a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2h-5l-1 1z"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M7 8h10M7 12h4m1 9l-1-1H6a2 2 0 01-2-2V6a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2h-5l-1 1z" />
           </svg>
-          ثبت دیدگاه
+          {loading ? "در حال ارسال..." : "ثبت دیدگاه"}
         </button>
       </div>
+
+      {/* پیام خطا یا موفقیت */}
+      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      {successMsg && <p className="mt-2 text-sm text-green-600">{successMsg}</p>}
     </div>
   );
 }
