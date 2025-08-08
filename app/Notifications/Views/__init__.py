@@ -1,2 +1,2 @@
 from .AdminNotificationViews import AdminNotificationViewSet
-from .UserNotificationViews import UserNotificationDetailView , UserNotificationListView
+from .UserNotificationViews import UserNotificationViewSet

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { notificationService } from "@/services/notification/notificationService";
 import { Notification } from "@/types/notification/notification";
 import NotificationItem from "./NotificationItem";
+import NotificationDetailDialog from "./NotificationDetailDialog";
 import Pagination from "./Pagination";
 
 export default function NotificationList() {
@@ -11,6 +12,10 @@ export default function NotificationList() {
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [pageSize] = useState(10);
+
+  // State برای باز بودن دیالوگ و اعلان انتخاب شده
+  const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchNotifications(page);
@@ -37,6 +42,24 @@ export default function NotificationList() {
     }
   }
 
+  // تابع باز کردن دیالوگ جزئیات و علامت خوانده شده
+  const handleViewDetails = async (id: number) => {
+    const notif = notifications.find((n) => n.id === id);
+    if (!notif) return;
+
+    if (!notif.is_read) {
+      await handleMarkRead(id);
+    }
+    setSelectedNotification(notif);
+    setIsDialogOpen(true);
+  };
+
+  // بستن دیالوگ
+  const closeDialog = () => {
+    setIsDialogOpen(false);
+    setSelectedNotification(null);
+  };
+
   const totalPages = Math.ceil(totalCount / pageSize);
 
   return (
@@ -52,10 +75,18 @@ export default function NotificationList() {
               key={notification.id}
               notification={notification}
               onMarkRead={handleMarkRead}
+              onViewDetails={handleViewDetails} // اضافه شده اینجا
             />
           ))}
 
           <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+
+          {isDialogOpen && selectedNotification && (
+            <NotificationDetailDialog
+              notification={selectedNotification}
+              onClose={closeDialog}
+            />
+          )}
         </>
       )}
     </div>
