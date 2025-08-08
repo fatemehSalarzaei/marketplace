@@ -16,7 +16,7 @@ class Notification(models.Model):
         ('custom', 'سفارشی'),
     ]
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications' , null = True)
     title = models.CharField(max_length=255)
     message = models.TextField()
     type = models.CharField(max_length=50, choices=TYPE_CHOICES, default='custom')
@@ -28,4 +28,4 @@ class Notification(models.Model):
     scheduled_at = models.DateTimeField(null=True, blank=True)  # برای ارسال با تاخیر
 
     def __str__(self):
-        return f"{self.user.phonr_number} - {self.title} ({self.channel})"
+        return f" {self.title} ({self.channel})"

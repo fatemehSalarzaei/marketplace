@@ -39,7 +39,7 @@ class UserFacingElementItemSerializer(serializers.ModelSerializer):
                 'name': obj.name,
                 'slug': obj.slug,
                 'price': getattr(obj, 'price', None),
-                'main_image': get_full_url(obj.main_image.url) if getattr(obj, 'main_image', None) else None,
+                'main_image': get_full_url(obj.main_image.image.url) if getattr(obj, 'main_image', None) else None,
                 'availability_status': obj.availability_status,
             }
 

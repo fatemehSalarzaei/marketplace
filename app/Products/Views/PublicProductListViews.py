@@ -13,25 +13,36 @@ class PublicProductListView(generics.ListAPIView):
     permission_classes = [AllowAny]
     serializer_class = PublicProductListSerializer
 
-    queryset = Product.objects.filter(status='published').prefetch_related(
-        'variants',
-        'variants__variant_attributes',
-        'variants__variant_attributes__attribute_value',
-        'variants__variant_attributes__attribute_value__attribute'
-    ).annotate(
-        min_price=Min('variants__price'),
-        max_price=Max('variants__price'),
-        total_sales=Sum('variants__order_items__quantity'),  # فرض بر اینکه رابطه order_items وجود داره
-        popularity=Count('variants__order_items')  # یا تعداد خریدها برای محبوبیت
+    queryset = (
+        Product.objects.filter(status='published')
+        .select_related('category', 'brand', 'main_image')
+        .prefetch_related(
+            'tags',
+            'gallery_images__image_asset',
+            'videos__video_asset',
+            'variants',
+            'variants__variant_attributes',
+            'variants__variant_attributes__attribute',
+            'variants__variant_attributes__predefined_value',
+            # 'variants__variant_attributes__value',
+        )
+        .annotate(
+            min_price=Min('variants__price'),
+            max_price=Max('variants__price'),
+            total_sales=Sum('variants__order_items__quantity'),
+            popularity=Count('variants__order_items'),
+        )
     )
 
-    
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = ProductFilter
-    
+
     search_fields = ['name', 'short_description', 'long_description']
-    ordering_fields = ['created_at', 'name', 'min_price', 'max_price', 'popularity', 'total_sales']
+    ordering_fields = [
+        'created_at', 'name', 'min_price', 'max_price', 'popularity', 'total_sales'
+    ]
     ordering = ['-created_at']
+
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context['request'] = self.request

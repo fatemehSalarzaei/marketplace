@@ -1,6 +1,6 @@
 import apiClient from '@/lib/axiosInstance';
 import { API_ENDPOINTS_ADMIN } from '@/lib/config';
-import { PaginatedNotificationResponse } from '@/types/admin/notification/notification';
+import { PaginatedNotificationResponse , AdminNotification } from '@/types/admin/notification/notification';
 
 
 interface NotificationQuery {
@@ -17,3 +17,9 @@ export async function fetchAdminNotifications(params: NotificationQuery) {
   });
   return response.data;
 }
+
+
+export const createNotification = async (data: AdminNotification) => {
+  const res = await apiClient.post(API_ENDPOINTS_ADMIN.notifications, data);
+  return res.data;
+};
