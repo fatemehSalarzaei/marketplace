@@ -4,7 +4,18 @@ import React, { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { logoutUser } from "@/services/auth/logout";
-import { Pencil } from "lucide-react";
+import {
+  Box,
+  Heart,
+  MessageSquare,
+  MapPin,
+  Bell,
+  Clock,
+  LogOut,
+  Headset,
+  Package,
+  Pencil,
+} from "lucide-react";
 
 export default function SidebarMenu() {
   const router = useRouter();
@@ -32,15 +43,14 @@ export default function SidebarMenu() {
   };
 
   const menuItems = [
-    { label: "خلاصه فعالیت‌ها", href: "/user", icon: "🏠" },
-    { label: "سفارش‌ها", href: "/user/orders", icon: "📦" },
-    { label: "لیست‌های علاقه مندی ", href: "/user/favorites", icon: "📋" },
-    { label: "دیدگاه‌ها و پرسش‌ها", href: "/user/reviews", icon: "💬" },
-    { label: "آدرس‌ها", href: "/user/addresses", icon: "🏠" },
-    { label: "پیام‌ها", href: "/user/notifications", icon: "🔔" },
-    { label: "بازدید‌های اخیر", href: "/user/user-history", icon: "🕒" },
-    { label: "اطلاعات حساب کاربری", href: "/user/personal-info", icon: "👤" },
-    { label: "خروج", href: "/logout", icon: "🚪", isLogout: true },
+    { label: "سفارش‌ها", href: "/user/orders", icon: <Package className="w-5 h-5" /> },
+    { label: "لیست‌های علاقه‌مندی", href: "/user/favorites", icon: <Heart className="w-5 h-5" /> },
+    { label: "دیدگاه‌ها و پرسش‌ها", href: "/user/reviews", icon: <MessageSquare className="w-5 h-5" /> },
+    { label: "آدرس‌ها", href: "/user/addresses", icon: <MapPin className="w-5 h-5" /> },
+    { label: "پیام‌ها", href: "/user/notifications", icon: <Bell className="w-5 h-5" /> },
+    { label: "بازدیدهای اخیر", href: "/user/user-history", icon: <Clock className="w-5 h-5" /> },
+    { label: "پشتیبانی و تیکت", href: "/user/support", icon: <Headset className="w-5 h-5" /> },
+    { label: "خروج", href: "/logout", icon: <LogOut className="w-5 h-5" />, isLogout: true },
   ];
 
   return (

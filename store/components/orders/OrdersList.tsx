@@ -51,7 +51,7 @@ export default function OrdersList() {
   }, [nextUrl]);
 
   return (
-    <div className="max-w-3xl mx-auto p-4">
+    <div className=" p-4">
       <h1 className="text-xl font-bold mb-4">سفارش‌های من</h1>
       <div className="mb-4">
         <label className="ml-2 font-medium">فیلتر وضعیت:</label>

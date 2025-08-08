@@ -48,7 +48,7 @@ export default function AddressPage() {
 
   return (
     <div
-      className="max-w-7xl mx-auto py-6 px-10 sm:px-12 font-iranyekan"
+      className=" py-5 px-5 sm:px-12 font-iranyekan"
       dir="rtl"
     >
       <div className="mr-6 sm:mr-0 flex justify-between items-center mb-4 flex-wrap gap-2">
