@@ -1,5 +1,5 @@
 from .SupportCategoryAdminViews import SupportCategoryAdminViewSet
-from .SupportCategoryUserViews import SupportCategoryUserViewSet
+from .SupportCategoryUserViews import SupportCategoryListAPIView
 from .UserTicketViews import PublicTicketCreateAPIView , UserTicketViewSet
 from .AdminTicketViews import AdminTicketViewSet
 from .UserTicketMessageViews import UserTicketMessageViewSet

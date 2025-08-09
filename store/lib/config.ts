@@ -32,6 +32,11 @@ export const API_ENDPOINTS = {
   getReviews: `${API_BASE_URL}/reviews/reviews/`, 
   submitReview: `${API_BASE_URL}/reviews/reviews/create/`,
   userNotifications: `${API_BASE_URL}/notifications/user/notifications/`,
+  myTickets: `${API_BASE_URL}/support/my-tickets/`,
+  supportCategories: `${API_BASE_URL}/support/support-categories/`,  
+  ticketMessages: `${API_BASE_URL}/support/ticket-messages/`, // ← این رو اضافه کن
+
+
 };
 
 export const API_ENDPOINTS_ADMIN = {
