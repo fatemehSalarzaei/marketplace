@@ -35,8 +35,8 @@ export const API_ENDPOINTS = {
   userNotifications: `${API_BASE_URL}/notifications/user/notifications/`,
   myTickets: `${API_BASE_URL}/support/my-tickets/`,
   supportCategories: `${API_BASE_URL}/support/support-categories/`,  
-  ticketMessages: `${API_BASE_URL}/support/ticket-messages/`, // ← این رو اضافه کن
-
+  ticketMessages: `${API_BASE_URL}/support/ticket-messages/`,
+recentViews: `${API_BASE_URL}/history/recent-views/`,
 
 };
 

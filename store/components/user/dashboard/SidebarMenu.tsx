@@ -48,7 +48,7 @@ export default function SidebarMenu() {
     { label: "دیدگاه‌ها و پرسش‌ها", href: "/user/reviews", icon: <MessageSquare className="w-5 h-5" /> },
     { label: "آدرس‌ها", href: "/user/addresses", icon: <MapPin className="w-5 h-5" /> },
     { label: "پیام‌ها", href: "/user/notifications", icon: <Bell className="w-5 h-5" /> },
-    { label: "بازدیدهای اخیر", href: "/user/user-history", icon: <Clock className="w-5 h-5" /> },
+    { label: "بازدیدهای اخیر", href: "/user/recent-views", icon: <Clock className="w-5 h-5" /> },
     { label: "پشتیبانی و تیکت", href: "/user/support", icon: <Headset className="w-5 h-5" /> },
     { label: "خروج", href: "/logout", icon: <LogOut className="w-5 h-5" />, isLogout: true },
   ];

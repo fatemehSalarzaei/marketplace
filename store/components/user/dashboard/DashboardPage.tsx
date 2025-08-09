@@ -36,9 +36,9 @@ export default function DashboardPanel({ data }: { data: DashboardPayload }) {
               <li key={f.id} className="p-3 bg-white rounded shadow-sm flex items-center gap-3">
                 {f.main_image_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={f.main_image_url} alt={f.product_name || ""} className="w-12 h-12 object-cover rounded" />
+                  <img src={f.main_image_url} alt={f.product_name || ""} className="w-30 h-30 object-cover rounded" />
                 ) : (
-                  <div className="w-12 h-12 bg-gray-100 rounded" />
+                  <div className="w-30 h-30 bg-gray-100 rounded" />
                 )}
                 <div>
                   <div className="font-medium">{f.product_name}</div>
