@@ -1,40 +1,29 @@
+// components/dashboard/FrequentPurchases.tsx
 "use client";
 
 import React from "react";
 
-export interface FrequentPurchase {
-  id: number;
-  name: string;
-  count: number;
-}
+export type FrequentPurchase = { id?: number; name: string; count: number };
 
-interface FrequentPurchasesProps {
-  items: FrequentPurchase[];
-}
-
-export default function FrequentPurchases({ items }: FrequentPurchasesProps) {
+export default function FrequentPurchases({ items }: { items: FrequentPurchase[] }) {
   return (
-    <section className="bg-white p-4 sm:p-5 rounded-md shadow">
-      <h2 className="text-black text-lg sm:text-xl font-semibold mb-4">
-        پرتکرارترین خریدها
-      </h2>
+    <div className="bg-white rounded-xl shadow-md p-4">
+      <div className="flex justify-between items-center mb-3">
+        <h3 className="text-lg font-semibold">خریدهای پرتکرار</h3>
+      </div>
+
       {items.length === 0 ? (
-        <p className="text-neutral-500 text-sm">
-          هیچ خرید پرتکراری وجود ندارد.
-        </p>
+        <p className="text-gray-500">مورد پرتکراری ثبت نشده است.</p>
       ) : (
-        <ul className="space-y-3">
-          {items.map(({ id, name, count }) => (
-            <li
-              key={id}
-              className="flex justify-between items-center border-b border-gray-200 pb-2 text-sm"
-            >
-              <span className="text-neutral-700">{name}</span>
-              <span className="text-neutral-500">تعداد: {count}</span>
+        <ul className="space-y-2">
+          {items.map((it, idx) => (
+            <li key={idx} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+              <span>{it.name}</span>
+              <span className="text-sm text-gray-600">{it.count} بار</span>
             </li>
           ))}
         </ul>
       )}
-    </section>
+    </div>
   );
 }

@@ -3,11 +3,10 @@ import Products from "@/types/products/product_list";
 import Link from "next/link";
 
 export default function ProductCard({ product }: { product: Products }) {
-  // اگر آدرس تصویر خالی بود، تصویر پیش‌فرض قرار می‌دهیم
   const imageSrc =
     product.main_image_url && product.main_image_url.trim() !== ""
       ? product.main_image_url
-      : "/images/default-product.png"; // مسیر تصویر پیش‌فرض را تنظیم کنید
+      : "/images/default-product.png";
 
   return (
     <Link href={`/product/${product.id}/${product.slug}`} className="block">
@@ -19,8 +18,6 @@ export default function ProductCard({ product }: { product: Products }) {
             alt={product.name}
             fill
             className="object-contain rounded-t-lg"
-            // اگر تصویر پیش‌فرض محلی است، نیازی به تنظیم loader ندارید
-            // اگر تصویر از CDN است، loader را تنظیم کنید
           />
         </div>
 
@@ -47,7 +44,7 @@ export default function ProductCard({ product }: { product: Products }) {
 
             <div className="flex items-center gap-1">
               <span className="text-gray-700">
-                {product.popularity.toFixed(1)}
+                {product.rating ? product.rating.toFixed(1) : "—"}
               </span>
               <svg
                 className="w-4 h-4 text-yellow-400"
@@ -59,10 +56,11 @@ export default function ProductCard({ product }: { product: Products }) {
             </div>
           </div>
 
-          {/* توضیح کوتاه */}
-          <p className="text-gray-500 text-sm line-clamp-2 mb-2">
-            {product.short_description}
-          </p>
+          {/* توضیح کوتاه با HTML */}
+          <div
+            className="text-gray-500 text-sm line-clamp-2 mb-2"
+            dangerouslySetInnerHTML={{ __html: product.short_description }}
+          />
 
           {/* قیمت */}
           <div className="text-right mt-auto">

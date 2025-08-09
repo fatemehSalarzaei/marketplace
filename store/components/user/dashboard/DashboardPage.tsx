@@ -1,73 +1,54 @@
+// components/dashboard/DashboardPanel.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
-import OrdersSection, { OrdersSummary } from "./OrdersSection";
-import ListsSection, { ListItem } from "./ListsSection";
-import FrequentPurchases, { FrequentPurchase } from "./FrequentPurchases";
-import { Menu, X } from "lucide-react";
+import React from "react";
+import OrdersSection from "./OrdersSection";
+import ListsSection from "./ListsSection";
+import FrequentPurchases from "./FrequentPurchases";
+import { DashboardPayload } from "@/types/dashboard/dashboard";
 
-export default function DashboardPage() {
-  const [user, setUser] = useState<{ fullName: string; phone: string }>({
-    fullName: "",
-    phone: "",
-  });
-  const [ordersSummary, setOrdersSummary] = useState<OrdersSummary>({
-    processing: 0,
-    delivered: 0,
-    returned: 0,
-  });
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const sampleLists: ListItem[] = [
-    { id: 1, title: "لیست خرید لوازم خانگی" },
-    { id: 2, title: "لیست کتاب‌های مورد علاقه" },
-  ];
-  const sampleFrequentPurchases: FrequentPurchase[] = [
-    { id: 1, name: "کفش اسپرت", count: 5 },
-    { id: 2, name: "هدفون بی‌سیم", count: 3 },
-  ];
-
-  useEffect(() => {
-    const fullName = localStorage.getItem("full_name") || "";
-    const phone = localStorage.getItem("phone_numbers") || "";
-    setUser({ fullName, phone });
-    setOrdersSummary({ processing: 2, delivered: 10, returned: 1 });
-  }, []);
+export default function DashboardPanel({ data }: { data: DashboardPayload }) {
+  const sampleLists = data.profile ? [{ id: 1, title: "لیست خرید من" }] : [];
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row">
-      {/* دکمه منوی موبایل */}
-      <div className="lg:hidden flex justify-between items-center p-4 bg-white shadow z-40 sticky top-0">
-        <button onClick={() => setSidebarOpen(true)} className="ml-auto">
-          <Menu className="w-6 h-6 text-gray-700" />
-        </button>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">خوش آمدید {data.profile?.fullName || data.profile?.phone || "کاربر"}</h1>
+          <p className="text-sm text-gray-500 mt-1">داشبورد شما</p>
+        </div>
       </div>
 
-      {/* سایدبار موبایل */}
-      {sidebarOpen && (
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-end">
-          <div className="bg-white w-64 h-full shadow-lg overflow-y-auto relative">
-            <button
-              className="absolute left-3 top-3 text-gray-600 hover:text-red-600"
-              onClick={() => setSidebarOpen(false)}
-              aria-label="بستن منو"
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
-          <div className="flex-1" onClick={() => setSidebarOpen(false)} />
-        </div>
-      )}
+      <OrdersSection ordersSummary={data.ordersSummary} />
 
-      {/* محتوای اصلی */}
-      <main className="flex-1 p-4 sm:p-6 space-y-6">
-        <h1 className="text-xl font-bold">
-          خوش آمدید {user.fullName || user.phone}
-        </h1>
-        <OrdersSection ordersSummary={ordersSummary} />
-        <ListsSection lists={sampleLists} />
-        <FrequentPurchases items={sampleFrequentPurchases} />
-      </main>
+      {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6"> */}
+        {/* <ListsSection lists={sampleLists} /> */}
+        <FrequentPurchases items={data.frequentPurchases.map(fp => ({ name: fp.product_name, count: fp.count }))} />
+      {/* </div> */}
+
+      <div>
+        <h3 className="text-lg font-semibold mb-2">علاقه‌مندی‌ها</h3>
+        {data.favorites.length === 0 ? (
+          <p className="text-gray-500">هنوز محصولی ذخیره نشده است.</p>
+        ) : (
+          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {data.favorites.map((f) => (
+              <li key={f.id} className="p-3 bg-white rounded shadow-sm flex items-center gap-3">
+                {f.main_image_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={f.main_image_url} alt={f.product_name || ""} className="w-12 h-12 object-cover rounded" />
+                ) : (
+                  <div className="w-12 h-12 bg-gray-100 rounded" />
+                )}
+                <div>
+                  <div className="font-medium">{f.product_name}</div>
+                  <div className="text-xs text-gray-500">ذخیره شده در: {new Date(f.created_at || "").toLocaleString("fa-IR")}</div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }

@@ -10,6 +10,7 @@ type Products = {
   max_price: string;
   total_sales: number;
   popularity: number;
+  rating?: number | null;
 };
 
 export default Products;

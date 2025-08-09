@@ -8,3 +8,4 @@ from .UserActivityLogSerializers import UserActivityLogSerializer
 from .LogEntrySerializers import LogEntrySerializer
 from .ModelAccessPermissionSerializers import ModelAccessPermissionSerializer
 from .MyRolePermissionSerializers import MyRolePermissionSerializer
+from .dashboardSerializers import *

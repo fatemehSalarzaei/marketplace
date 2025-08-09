@@ -4,7 +4,8 @@ export const API_BASE_URL = "http://127.0.0.1:8000/api/v1";
 
 export const API_ENDPOINTS = {
   home: `${API_BASE_URL}/home/`,
-  refreshTokenUrl: `${API_BASE_URL}/token/refresh/`,
+  refreshTokenUrl: `${API_BASE_URL}/token/refresh/`, 
+  dashboard: `${API_BASE_URL}/accounts/dashboard/`,
   verifyOtp: `${API_BASE_URL}/accounts/auth/verify-code/`,
   logout: `${API_BASE_URL}/accounts/logout/`,
   getProfile: `${API_BASE_URL}/accounts/profile/`,

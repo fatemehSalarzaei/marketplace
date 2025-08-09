@@ -15,6 +15,7 @@ router.register(r'admin/user-activity-logs', UserActivityLogViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path("dashboard/", user_dashboard, name="user-dashboard"),
     path('admin/my-role/', MyRoleAPIView.as_view(), name='my-role-info'),
     path("auth/send-code/", SendCodeView.as_view(), name="send-code"),
     path("auth/verify-code/", VerifyCodeView.as_view(), name="verify-code"),

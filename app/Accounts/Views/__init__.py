@@ -8,3 +8,4 @@ from .UserActivityLogViews import UserActivityLogViewSet
 from .AdminLogEntryViews import AdminLogEntryListView
 from .ModelAccessPermissionListViews import ModelAccessPermissionListAPIView
 from .MyRoleViews import MyRoleAPIView
+from .userDashboardViews import user_dashboard

@@ -6,9 +6,13 @@ export async function getFilteredProducts(
   params: FilterParams & { ordering?: string }
 ) {
   const query: Record<string, string> = {
-    category_slug: params.category_slug,
     page: params.page?.toString() || "1",
   };
+
+  // فقط وقتی category_slug مقدار معتبر دارد اضافه شود
+  if (params.category_slug && params.category_slug !== "none") {
+    query["category_slug"] = params.category_slug;
+  }
 
   if (params.brand) {
     query["brand"] = Array.isArray(params.brand)
@@ -42,6 +46,9 @@ export async function getFilteredProducts(
 
   if (params.ordering) {
     query["ordering"] = params.ordering;
+  }
+  if (params.search) {
+    query["search"] = params.search;
   }
 
   const queryString = new URLSearchParams(query).toString();

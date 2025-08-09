@@ -1,36 +1,27 @@
+// components/dashboard/ListsSection.tsx
 "use client";
 
 import React from "react";
 
-export interface ListItem {
-  id: number;
-  title: string;
-}
+export type ListItem = { id: number; title: string };
 
-interface ListsSectionProps {
-  lists: ListItem[];
-}
-
-export default function ListsSection({ lists }: ListsSectionProps) {
+export default function ListsSection({ lists }: { lists: ListItem[] }) {
   return (
-    <section className="bg-white p-4 sm:p-5 rounded-md shadow">
-      <h2 className="text-black text-lg sm:text-xl font-semibold mb-4">
-        لیست‌های من
-      </h2>
+    <div className="bg-white rounded-xl shadow-md p-4">
+      {/* <div className="flex justify-between items-center mb-3">
+        <h3 className="text-lg font-semibold">لیست‌های شما</h3>
+        <button className="text-sm text-blue-600">مدیریت</button>
+      </div> */}
+
       {lists.length === 0 ? (
-        <p className="text-neutral-500 text-sm">لیستی وجود ندارد.</p>
+        <p className="text-gray-500">هیچ لیستی وجود ندارد.</p>
       ) : (
-        <ul className="list-disc pr-5 space-y-2">
-          {lists.map(({ id, title }) => (
-            <li
-              key={id}
-              className="text-neutral-700 cursor-pointer hover:text-blue-600 text-sm"
-            >
-              {title}
-            </li>
+        <ul className="space-y-2">
+          {lists.map((l) => (
+            <li key={l.id} className="p-2 bg-gray-50 rounded">{l.title}</li>
           ))}
         </ul>
       )}
-    </section>
+    </div>
   );
 }
