@@ -131,7 +131,7 @@ export default function AdminSidebarMenu() {
       key: "homepage",
       children: [
         { label: "نوع المان‌ها", href: "/admin/homepage/types" },
-        { label: "المان‌ها", href: "/admin/homepage/elements" },
+        { label: "المان‌ها", href: "/admin/page-builder/elements" },
         { label: "آیتم المان‌ها", href: "/admin/homepage/items" },
       ],
     },

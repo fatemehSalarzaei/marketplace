@@ -11,3 +11,4 @@ class ElementViewSet(viewsets.ModelViewSet):
     serializer_class = ElementSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAdminUser , HasModelPermission]
+    pagination_class = None

@@ -66,6 +66,8 @@ class Element(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.element_type.name})"
+    class Meta:
+        ordering = ['position']
 
 
 class ElementItem(models.Model):
@@ -86,3 +88,5 @@ class ElementItem(models.Model):
 
     def __str__(self):
         return f"Item {self.id} for {self.element.name}"
+    class Meta:
+        ordering = ['position']

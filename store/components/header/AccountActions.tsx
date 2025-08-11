@@ -112,7 +112,7 @@ export default function AccountActions() {
               </li>
               <li>
                 <Link
-                  href="user/favorites"
+                  href="/user/favorites"
                   className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100"
                   onClick={() => setIsMenuOpen(false)}
                 >
@@ -122,7 +122,7 @@ export default function AccountActions() {
               </li>
               <li>
                 <Link
-                  href="/user/comments"
+                  href="/user/reviews"
                   className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100"
                   onClick={() => setIsMenuOpen(false)}
                 >

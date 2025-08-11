@@ -68,6 +68,10 @@ export const API_ENDPOINTS_ADMIN = {
   returns_order : `${API_BASE_URL}/orders/admin/returns/`,
   payment_gateways : `${API_BASE_URL}/payments/admin/payment-gateways/`,
   notifications : `${API_BASE_URL}/notifications/admin/notifications/`,
+  elements : `${API_BASE_URL}/page-builder/elements/`,
+  elementitems : `${API_BASE_URL}/page-builder/elementitems/`,
+  update_positions : `${API_BASE_URL}/page-builder/element/update-positions/`,
+  elementtypes : `${API_BASE_URL}/page-builder/admin/elementtypes/`,
 
 
   

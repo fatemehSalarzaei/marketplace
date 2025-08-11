@@ -10,5 +10,6 @@ router.register(r'elementitems', ElementItemViewSet, basename='elementitem')
 urlpatterns = [
     path('', include(router.urls)),
     path('user-facing/elements/', UserFacingElementListAPIView.as_view(), name='user-facing-element-list'),
+    path('element/update-positions/', update_positions, name='update_positions'),
 
 ]

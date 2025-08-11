@@ -10,4 +10,5 @@ class ElementTypeViewSet(viewsets.ModelViewSet):
     queryset = ElementType.objects.all()
     serializer_class = ElementTypeSerializer
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAdminUser , HasModelPermission]  # فقط ادمین‌ها اجازه دارند
+    permission_classes = [IsAdminUser , HasModelPermission] 
+    pagination_class = None
