@@ -3,3 +3,5 @@ from .ElementViews import ElementViewSet
 from .ElementItemViews import ElementItemViewSet
 from .UserFacingElementViews import UserFacingElementListAPIView
 from .updatePositionsviews import update_positions
+from .RelatedObjectByElementViews import RelatedObjectByElementView
+from .updateElementItemsPositionsviews import update_element_items_positions

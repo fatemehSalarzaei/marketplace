@@ -11,16 +11,21 @@ export interface Element {
   end_at?: string;
   html_content?: string;
 }
-
 export interface ElementItem {
   id: number;
   element: number;
   title?: string;
   position: number;
   object_id?: number;
+  object_data?: {
+    id: number;
+    name?: string;
+    str?: string;
+  };
   extra_data?: Record<string, any>;
   is_active: boolean;
 }
+
 
 export interface RelatedObject {
   id: number;

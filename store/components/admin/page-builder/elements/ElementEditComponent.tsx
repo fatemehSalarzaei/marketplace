@@ -57,6 +57,9 @@ export default function ElementEditComponent({ elementId }: Props) {
 
   async function handleItemSubmit(data: Partial<ElementItem>) {
     try {
+      if (!data.element) {
+        data.element = elementId;
+      }
       if (data.id) {
         await updateElementItem(data.id, data)
       } else {
@@ -115,14 +118,14 @@ export default function ElementEditComponent({ elementId }: Props) {
 
         {itemFormVisible && (
           <ElementItemForm
-            elementType={element.element_type}
-            item={editingItem || undefined}
-            onSubmit={handleItemSubmit}
-            onCancel={() => {
-              setItemFormVisible(false)
-              setEditingItem(null)
-            }}
-          />
+          elementId={elementId}  // این خط اضافه شود
+          item={editingItem || undefined}
+          onSubmit={handleItemSubmit}
+          onCancel={() => {
+            setItemFormVisible(false)
+            setEditingItem(null)
+          }}
+        />
         )}
 
         <ElementItemList

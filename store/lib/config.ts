@@ -72,6 +72,8 @@ export const API_ENDPOINTS_ADMIN = {
   elementitems : `${API_BASE_URL}/page-builder/elementitems/`,
   update_positions : `${API_BASE_URL}/page-builder/element/update-positions/`,
   elementtypes : `${API_BASE_URL}/page-builder/admin/elementtypes/`,
+  related_objects : `${API_BASE_URL}/page-builder/admin/related-objects-by-element/`,
+  update_element_items_positions : `${API_BASE_URL}/page-builder/admin/update-element-items-positions/`,
 
 
   

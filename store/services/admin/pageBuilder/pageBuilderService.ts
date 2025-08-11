@@ -66,3 +66,26 @@ export const updateElementsPositions = async (elements: Partial<Element>[]) => {
   const res = await apiClient.post(API_ENDPOINTS_ADMIN.update_positions, payload);
   return res.data;
 };
+
+export const getRelatedObjectsByElement = async (
+  elementId: number,
+  search?: string
+): Promise<RelatedObject[]> => {
+  const params = new URLSearchParams({ element_id: String(elementId) });
+  if (search) params.append("search", search);
+
+  const res = await apiClient.get(
+    `${API_ENDPOINTS_ADMIN.related_objects}?${params.toString()}`
+  );
+  return res.data;
+};
+
+export const updateElementItemsPositions = async (items: Partial<ElementItem>[]) => {
+  // فقط id و position ارسال می‌کنیم
+  const payload = items.map(({ id, position }) => ({ id, position }));
+  const res = await apiClient.post(
+    API_ENDPOINTS_ADMIN.update_element_items_positions,
+    payload
+  );
+  return res.data;
+};

@@ -130,16 +130,30 @@ export default function AdminSidebarMenu() {
       icon: Home,
       key: "homepage",
       children: [
-        { label: "نوع المان‌ها", href: "/admin/homepage/types" },
+        // { label: "نوع المان‌ها", href: "/admin/homepage/types" },
         { label: "المان‌ها", href: "/admin/page-builder/elements" },
-        { label: "آیتم المان‌ها", href: "/admin/homepage/items" },
+        // { label: "آیتم المان‌ها", href: "/admin/homepage/items" },
       ],
     },
-    {
-      label: "گزارشات و آمار",
-      href: "/admin/reports",
-      icon: BarChart2,
-    },
+     {
+    label: "گزارشات و آمار",
+    icon: BarChart2,
+    key: "reports",
+    children: [
+      {
+        label: "گزارشات فروش و محصولات",
+        href: "/admin/reports/sales-products",
+      },
+      {
+        label: "گزارشات مشتریان و کانال‌ها",
+        href: "/admin/reports/customers-channels",
+      },
+      {
+        label: "گزارشات مالی و لجستیک",
+        href: "/admin/reports/finance-logistics",
+      },
+    ],
+  },
     {
       label: "خروج",
       href: "/logout",

@@ -11,5 +11,11 @@ urlpatterns = [
     path('', include(router.urls)),
     path('user-facing/elements/', UserFacingElementListAPIView.as_view(), name='user-facing-element-list'),
     path('element/update-positions/', update_positions, name='update_positions'),
+    path("admin/related-objects-by-element/", RelatedObjectByElementView.as_view(), name="related-objects-by-element"),
+    path(
+        "admin/update-element-items-positions/",
+        update_element_items_positions,
+        name="update-element-items-positions"
+    ),
 
 ]
