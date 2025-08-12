@@ -1,6 +1,6 @@
+from django.db.models import Sum, Count, Q
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from django.db.models import Sum, Count
 from django.utils.dateparse import parse_date
 
 from Orders.models import Order
@@ -15,16 +15,17 @@ def financial_logistics_report(request):
     orders = Order.objects.all()
     payments = Payment.objects.all()
     invoices = Invoice.objects.all()
-    shipping_methods = ShippingMethod.objects.all()
 
     if start_date:
-        orders = orders.filter(created_at__date__gte=parse_date(start_date))
-        payments = payments.filter(payment_date__date__gte=parse_date(start_date))
-        invoices = invoices.filter(created_at__date__gte=parse_date(start_date))
+        start = parse_date(start_date)
+        orders = orders.filter(created_at__date__gte=start)
+        payments = payments.filter(payment_date__date__gte=start)
+        invoices = invoices.filter(created_at__date__gte=start)
     if end_date:
-        orders = orders.filter(created_at__date__lte=parse_date(end_date))
-        payments = payments.filter(payment_date__date__lte=parse_date(end_date))
-        invoices = invoices.filter(created_at__date__lte=parse_date(end_date))
+        end = parse_date(end_date)
+        orders = orders.filter(created_at__date__lte=end)
+        payments = payments.filter(payment_date__date__lte=end)
+        invoices = invoices.filter(created_at__date__lte=end)
 
     total_order_count = orders.count()
     total_paid_orders = orders.filter(is_paid=True).count()
@@ -40,12 +41,27 @@ def financial_logistics_report(request):
 
     # جمع تعداد سفارش‌ها به تفکیک روش ارسال
     shipping_method_counts = orders.values('shipping_method__name').annotate(count=Count('id'))
-
     shipping_methods_summary = []
     for sm in shipping_method_counts:
         shipping_methods_summary.append({
             'shipping_method': sm['shipping_method__name'] or 'بدون روش ارسال',
             'order_count': sm['count']
+        })
+
+    # --- افزودن محاسبه داده‌های روش‌های پرداخت ---
+    payment_methods_data = []
+    payment_method_choices = Payment._meta.get_field('payment_method').choices
+
+    for method_key, method_label in payment_method_choices:
+        payments_for_method = payments.filter(payment_method=method_key)
+        count = payments_for_method.count()
+        success_count = payments_for_method.filter(status='success').count()
+        success_rate = (success_count / count) if count > 0 else 0
+
+        payment_methods_data.append({
+            'method': method_label,
+            'count': count,
+            'successRate': round(success_rate, 2),
         })
 
     return Response({
@@ -56,4 +72,5 @@ def financial_logistics_report(request):
         'total_invoices': total_invoices,
         'order_status_summary': status_summary,
         'shipping_methods_summary': shipping_methods_summary,
+        'payment_methods_data': payment_methods_data,   # اضافه شده
     })
