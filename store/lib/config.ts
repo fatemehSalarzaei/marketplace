@@ -77,6 +77,8 @@ export const API_ENDPOINTS_ADMIN = {
   salesReport : `${API_BASE_URL}/reports/admin/sales/`,
   topProducts : `${API_BASE_URL}/reports/admin/top-products/`,
   lowStockProducts : `${API_BASE_URL}/reports/admin/low-stock-products/`,
+  customers : `${API_BASE_URL}/reports/admin/customers/`,
+  financial_logistics : `${API_BASE_URL}/reports/admin/financial-logistics/`,
 
 
   
