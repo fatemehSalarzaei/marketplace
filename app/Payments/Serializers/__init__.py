@@ -3,3 +3,4 @@ from .PaymentGatewayPublicSerializers import PaymentGatewayPublicSerializer
 from .PaymentReceiptUploadSerializers import PaymentReceiptUploadSerializer
 from .AdminPaymentReviewSerializers import AdminPaymentReviewSerializer
 from .PaymentAdminSerializers import PaymentAdminSerializer
+from .PaymentSerializer import  PaymentSerializer

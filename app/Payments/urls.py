@@ -14,5 +14,6 @@ urlpatterns = [
     path('admin/reports/payments/', AdminPaymentReportAPIView.as_view(), name='admin-payment-reports'),
     path('admin/reports/payments/export/pdf/', AdminPaymentPDFExportAPIView.as_view(), name='admin-payment-export-pdf'),
     path('admin/reports/payments/export/excel/', AdminPaymentExcelExportAPIView.as_view(), name='admin-payment-export-excel'),
+    path('admin/payments/', payment_list, name='payment-list'),
 
 ]
