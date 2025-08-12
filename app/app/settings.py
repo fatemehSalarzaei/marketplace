@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     'PageBuilder',
     'Banner',
     'Support',
+    'Reports',
 
     # 'Products',
     'Reviews',
@@ -239,3 +240,4 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+MANAGER_EMAIL = "s@gmail.com"

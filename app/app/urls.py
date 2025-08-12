@@ -57,6 +57,7 @@ api_urlpatterns = [
     path('page-builder/', include('PageBuilder.urls')),
     path('banner/', include('Banner.urls')),
     path('support/', include('Support.urls')),
+    path('reports/', include('Reports.urls')),
 
     path('home/', UserFacingElementListAPIView.as_view(), name='user-facing-element-list'),
 

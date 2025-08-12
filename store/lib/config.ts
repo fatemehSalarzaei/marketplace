@@ -74,6 +74,9 @@ export const API_ENDPOINTS_ADMIN = {
   elementtypes : `${API_BASE_URL}/page-builder/admin/elementtypes/`,
   related_objects : `${API_BASE_URL}/page-builder/admin/related-objects-by-element/`,
   update_element_items_positions : `${API_BASE_URL}/page-builder/admin/update-element-items-positions/`,
+  salesReport : `${API_BASE_URL}/reports/admin/sales/`,
+  topProducts : `${API_BASE_URL}/reports/admin/top-products/`,
+  lowStockProducts : `${API_BASE_URL}/reports/admin/low-stock-products/`,
 
 
   

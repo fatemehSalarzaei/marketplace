@@ -3,10 +3,10 @@ from django.urls import path
 from Reports.views import *
 
 urlpatterns = [
-    path('sales/', sales_report, name='sales-report'),
-    path('top-products/', top_products_report, name='top-products-report'),
-    path('low-stock-products/', low_stock_products_report, name='low-stock-products-report'),
-    path('api/reports/customers/', customers_report, name='customers-report'),
-    path('api/reports/financial-logistics/', financial_logistics_report, name='financial-logistics-report'),
+    path('admin/sales/', sales_report, name='sales-report'),
+    path('admin/top-products/', top_products_report, name='top-products-report'),
+    path('admin/low-stock-products/', low_stock_products_report, name='low-stock-products-report'),
+    path('admin/customers/', customers_report, name='customers-report'),
+    path('admin/financial-logistics/', financial_logistics_report, name='financial-logistics-report'),
 
 ]

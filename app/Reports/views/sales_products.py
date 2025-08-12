@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.db.models import Sum, Count, Q, F
 from django.utils.dateparse import parse_date
-from Orders.models import Order, OrderItem, Payment
+from Orders.models import Order, OrderItem
 from Products.models import ProductVariant
 from django.db.models import Sum, Count
 from django.utils.dateparse import parse_date
