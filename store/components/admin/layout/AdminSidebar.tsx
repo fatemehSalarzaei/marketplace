@@ -8,24 +8,17 @@ import {
   ChevronLeft,
   LogOut,
   Users,
-  Tags,
-  Image,
-  Video,
-  Home,
   Box,
-  Sliders,
   ShoppingCart,
+  Bell,
   Truck,
-  CreditCard,
+  Image,
+  Ticket,
+  Home,
   BarChart2,
   Edit3,
-  FileText,
-  RefreshCcw,
-  DollarSign,
-  Ticket,
-  LayoutDashboard,
-  Bell, // اضافه شده برای مدیریت اعلان‌ها
 } from "lucide-react";
+import { logoutUser } from "@/services/auth/logout"; // اینجا مسیر سرویس logout
 
 export default function AdminSidebarMenu() {
   const pathname = usePathname();
@@ -46,14 +39,23 @@ export default function AdminSidebarMenu() {
     );
   };
 
-  const handleLogout = (e: React.MouseEvent) => {
+  const handleLogout = async (e: React.MouseEvent) => {
     e.preventDefault();
-    router.push("/auth/login");
+    try {
+      await logoutUser(); // فراخوانی API خروج
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("full_name");
+      localStorage.removeItem("phone_numbers");
+      router.replace("/auth/login"); // ریدایرکت بعد از خروج
+    } catch (err) {
+      console.error("خطا در خروج:", err);
+    }
   };
 
   const handleEditProfile = () => {
     router.push("/admin/profile");
   };
+
   const menuItems = [
     {
       label: "مدیریت کاربران",
@@ -92,9 +94,7 @@ export default function AdminSidebarMenu() {
       label: "مدیریت اعلان‌ها",
       icon: Bell,
       key: "notifications",
-      children: [
-        { label: "لیست اعلان‌ها", href: "/admin/notifications" },
-      ],
+      children: [{ label: "لیست اعلان‌ها", href: "/admin/notifications" }],
     },
     {
       label: "حمل‌ونقل و پرداخت",
@@ -120,7 +120,7 @@ export default function AdminSidebarMenu() {
       icon: Ticket,
       key: "support",
       children: [
-        { label: " نظرات کاربران", href: "/admin/support/reviews" },
+        { label: "نظرات کاربران", href: "/admin/support/reviews" },
         { label: "لیست تیکت‌ها", href: "/admin/support/tickets" },
         { label: "دسته‌بندی پشتیبانی", href: "/admin/support/categories" },
       ],
@@ -129,34 +129,29 @@ export default function AdminSidebarMenu() {
       label: "صفحه اصلی سایت",
       icon: Home,
       key: "homepage",
+      children: [{ label: "المان‌ها", href: "/admin/page-builder/elements" }],
+    },
+    {
+      label: "گزارشات و آمار",
+      icon: BarChart2,
+      key: "reports",
       children: [
-        // { label: "نوع المان‌ها", href: "/admin/homepage/types" },
-        { label: "المان‌ها", href: "/admin/page-builder/elements" },
-        // { label: "آیتم المان‌ها", href: "/admin/homepage/items" },
+        {
+          label: "گزارشات فروش و محصولات",
+          href: "/admin/reports/sales-products",
+        },
+        {
+          label: "گزارشات مشتریان و کانال‌ها",
+          href: "/admin/reports/customers-channels",
+        },
+        {
+          label: "گزارشات مالی و لجستیک",
+          href: "/admin/reports/finance-logistics",
+        },
       ],
     },
-     {
-    label: "گزارشات و آمار",
-    icon: BarChart2,
-    key: "reports",
-    children: [
-      {
-        label: "گزارشات فروش و محصولات",
-        href: "/admin/reports/sales-products",
-      },
-      {
-        label: "گزارشات مشتریان و کانال‌ها",
-        href: "/admin/reports/customers-channels",
-      },
-      {
-        label: "گزارشات مالی و لجستیک",
-        href: "/admin/reports/finance-logistics",
-      },
-    ],
-  },
     {
       label: "خروج",
-      href: "/logout",
       icon: LogOut,
       isLogout: true,
     },
@@ -195,7 +190,7 @@ export default function AdminSidebarMenu() {
                 className="flex items-center gap-3 px-4 py-3 mt-auto text-red-600 hover:bg-gray-100 rounded transition"
                 type="button"
               >
-                <item.icon className="w-5 h-5" />
+                <LogOut className="w-5 h-5" />
                 <span>{item.label}</span>
               </button>
             );
