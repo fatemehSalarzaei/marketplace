@@ -45,6 +45,7 @@ export const API_ENDPOINTS_ADMIN = {
   categories_all: `${API_BASE_URL}/categories/admin/categories-all/`,
   brands: `${API_BASE_URL}/brands/admin/brands/`,
   permissions: `${API_BASE_URL}/accounts/model-access-permissions/`,
+  logs: `${API_BASE_URL}/accounts/admin/logs/`,
   regularUsers: `${API_BASE_URL}/accounts/admin/regular-users/`,
   adminUsers: `${API_BASE_URL}/accounts/admin/admin-users/`,
   attributes: `${API_BASE_URL}/attributes/admin/attributes/`,

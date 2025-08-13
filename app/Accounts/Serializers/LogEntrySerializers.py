@@ -1,9 +1,14 @@
 from auditlog.models import LogEntry
 from rest_framework import serializers
+from Accounts.models import User
 
+class ActorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "first_name", "last_name","email", "phone_number"]  # فیلدهای دلخواه
 
 class LogEntrySerializer(serializers.ModelSerializer):
-    actor = serializers.StringRelatedField()
+    actor = ActorSerializer(read_only=True)  # استفاده از Serializer تو در تو
     content_type = serializers.StringRelatedField()
     action_display = serializers.SerializerMethodField()
 
