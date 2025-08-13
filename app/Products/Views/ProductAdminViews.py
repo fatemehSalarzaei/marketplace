@@ -6,9 +6,11 @@ from rest_framework import status
 from slugify import slugify
 from rest_framework import viewsets, filters
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.response import Response
+
 
 from Products.models import Product
-from Products.Serializers import ProductAdminSerializer
+from Products.Serializers import ProductAdminSerializer , ProductDetailAdminSerializer
 
 from .ProductFilter import ProductFilter
 
@@ -26,6 +28,11 @@ class ProductAdminViewSet(viewsets.ModelViewSet):
     search_fields = ['name', 'product_code', 'short_description', 'long_description']
     ordering_fields = ['created_at', 'updated_at', 'name']
 
+    @action(detail=True, methods=['get'], url_path='details')
+    def retrieve_details(self, request, pk=None):
+        product = self.get_object()
+        serializer = ProductDetailAdminSerializer(product, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['patch'], url_path='change-status')
     def change_status(self, request, pk=None):

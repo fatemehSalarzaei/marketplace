@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from django.db.models import Sum
+
 from Products.models import (
     Product,
     ProductGalleryImage,
@@ -118,6 +120,7 @@ class ProductDetailAdminSerializer(serializers.ModelSerializer):
     brand = BrandSerializer(read_only=True)
     category = CategorySerializer(read_only=True)
     main_image = ImageAssetShortSerializer(read_only=True)
+    total_stock = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -139,4 +142,10 @@ class ProductDetailAdminSerializer(serializers.ModelSerializer):
             'category',
             'attributes',
             'variants',
+        
+            'total_stock',
         ]
+
+    def get_total_stock(self, obj):
+        result = obj.variants.aggregate(total_stock=Sum('stock'))
+        return result.get('total_stock') or 0

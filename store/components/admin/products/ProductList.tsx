@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { fetchProducts, Product } from "@/services/products/fetchProducts";
+import { fetchProducts,Product } from "@/services/admin/products/productService";
 import ProductTable from "./ProductTable";
 import DeleteProductModal from "./DeleteProductModal";
 

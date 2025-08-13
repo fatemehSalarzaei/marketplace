@@ -2,6 +2,8 @@ from django_filters import rest_framework as filters
 from Products.models import Product
 from Categories.models import Category
 from django.db.models import Min, Max
+from django.db.models import Q
+
 
 class CharInFilter(filters.BaseInFilter, filters.CharFilter):
     pass
@@ -61,11 +63,14 @@ class ProductFilter(filters.FilterSet):
 
     def filter_by_availability_status(self, queryset, name, value):
         values = value.split(',')
+        q = Q()
         if 'in_stock' in values:
-            queryset = queryset.filter(variants__stock__gt=0)
+            q |= Q(variants__stock__gt=0)
         if 'out_of_stock' in values:
-            queryset = queryset.filter(variants__stock=0)
-        return queryset.distinct()
+            q |= Q(variants__stock=0)
+        if q:
+            return queryset.filter(q).distinct()
+        return queryset
 
     def filter_by_min_price(self, queryset, name, value):
         return queryset.annotate(min_price=Min('variants__price')).filter(min_price__gte=value)

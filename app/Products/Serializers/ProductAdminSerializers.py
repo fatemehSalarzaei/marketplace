@@ -2,6 +2,7 @@ from rest_framework import serializers
 from Products.models import Product, ProductGalleryImage, ImageAsset
 from Tags.models import Tag
 from Categories.models import Category
+from django.db.models import Sum
 
 class TagShortSerializer(serializers.ModelSerializer):
     class Meta:
@@ -41,6 +42,8 @@ class ProductAdminSerializer(serializers.ModelSerializer):
     availability_status = serializers.ChoiceField(choices=Product.AVAILABILITY_CHOICES)
     min_order_quantity = serializers.IntegerField()
     max_order_quantity = serializers.IntegerField()
+    total_stock = serializers.SerializerMethodField()
+
 
     class Meta:
         model = Product
@@ -49,4 +52,10 @@ class ProductAdminSerializer(serializers.ModelSerializer):
             'main_image', 'main_image_id', 'status', 'created_at', 'updated_at',
             'category', 'category_id', 'tags', 'tag_ids',
             'min_order_quantity', 'max_order_quantity', 'availability_status',
+        
+            'total_stock',
         ]
+
+    def get_total_stock(self, obj):
+        result = obj.variants.aggregate(total_stock=Sum('stock'))
+        return result.get('total_stock') or 0

@@ -13,7 +13,7 @@ class ImageAssetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ImageAsset
-        fields ='__all__'
+        fields = '__all__'
         read_only_fields = ['created_at', 'updated_at']
 
 
@@ -76,7 +76,7 @@ class ProductVariantSerializer(serializers.ModelSerializer):
                 qs = qs.exclude(id=instance.id)
             if qs.exists():
                 raise serializers.ValidationError({
-                    'sku': 'A variant with this SKU already exists for this product.'
+                    'sku': 'یک متغیر با این SKU قبلاً برای این محصول ثبت شده است.'
                 })
         return data
 

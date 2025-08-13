@@ -10,6 +10,7 @@ export interface Product {
   category?: { id: string; name: string };
   status?: string;
   availability?: string;
+  total_stock ? : number;
   // سایر فیلدهای مورد نیاز
 }
 
@@ -39,7 +40,7 @@ export async function fetchProducts(params: {
   if (params.page !== undefined) filteredParams.page = params.page;
   if (params.search && params.search.trim() !== "") filteredParams.search = params.search.trim();
   if (params.status && params.status.trim() !== "") filteredParams.status = params.status.trim();
-  if (params.availability && params.availability.trim() !== "") filteredParams.availability = params.availability.trim();
+  if (params.availability && params.availability.trim() !== "") filteredParams.availability_status = params.availability.trim();
   if (params.category && params.category.trim() !== "") filteredParams.category_slug = params.category.trim();
 
   console.log("Sending params:", filteredParams);
@@ -57,3 +58,10 @@ export const deleteProduct = async (productId: string): Promise<boolean> => {
     return false;
   }
 };
+
+export async function fetchProductById(productId: string) {
+  if (!productId) throw new Error("Product ID is required");
+
+  const res = await apiClient.get(`${API_ENDPOINTS_ADMIN.getFilteredProducts}${productId}/details/`);
+  return res.data;
+}

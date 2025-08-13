@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { TrashIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
-import { Product } from "@/services/products/fetchProducts";
+import {   Product } from "@/services/admin/products/productService";
 
 interface Props {
   products: Product[];
@@ -55,7 +55,7 @@ export default function ProductTable({
                 {product.category?.name || "بدون دسته‌بندی"}
               </td>
               <td className="px-4 py-2">
-                {AVAILABILITY_LABELS[product.availability] || "نامشخص"}
+                {product.total_stock || "نامشخص"}
               </td>
               <td className="px-4 py-2">
                 {STATUS_LABELS[product.status] || "نامشخص"}

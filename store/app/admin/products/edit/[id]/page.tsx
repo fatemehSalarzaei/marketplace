@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import CreateProductPage from "@/components/admin/products/create/CreateProductPage"
-import { getProduct } from '@/services/admin/products/products_save'
+import { fetchProductById } from '@/services/admin/products/productService'
 import { Product } from '@/types/admin/products/products_save'
 
 export default function EditProductPage() {
@@ -16,9 +16,9 @@ export default function EditProductPage() {
   useEffect(() => {
     if (!id) return
     setLoading(true)
-    getProduct(Number(id))
+    fetchProductById(Number(id))
       .then((data) => {
-        setProduct(data.data)
+        setProduct(data)
         setLoading(false)
       })
       .catch((err) => {
