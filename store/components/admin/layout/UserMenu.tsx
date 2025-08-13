@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown, LogOut, User } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { logoutUser } from "@/services/auth/logout"; 
+
 
 interface Props {
   userName?: string;
@@ -15,7 +17,7 @@ export default function UserMenu({ userName, userPhone }: Props) {
   const router = useRouter();
 
   const handleLogout = () => {
-    localStorage.removeItem("access_token");
+    logoutUser();
     router.replace("/");
   };
 

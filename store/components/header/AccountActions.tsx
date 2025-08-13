@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 import { logoutUser } from "@/services/auth/logout";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function AccountActions() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -23,14 +23,14 @@ export default function AccountActions() {
   const [userPhone, setUserPhone] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const token = Cookies.get("access_token");
     setIsLoggedIn(!!token);
 
     const name = localStorage.getItem("full_name") || "";
-    const phone = localStorage.getItem("phone_numbers") || "";
-
+    const phone = localStorage.getItem("phone_number") || "";
     setUserName(name);
     setUserPhone(phone);
   }, []);
@@ -48,9 +48,7 @@ export default function AccountActions() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   const handleLogout = async () => {
     await logoutUser();
@@ -69,22 +67,17 @@ export default function AccountActions() {
       <div ref={containerRef} className="relative z-50">
         <button
           onClick={toggleMenu}
-          className="flex items-center gap-2 rounded-md focus:outline-none p-1 hover:bg-gray-100"
-          aria-haspopup="true"
-          aria-expanded={isMenuOpen}
-          aria-label="Account menu"
-          type="button"
+          className="flex items-center gap-2 rounded-md p-1 hover:bg-gray-100"
         >
           <User className="w-8 h-8 text-gray-700 rounded-full border border-gray-300 p-1" />
           <ChevronDown className="w-5 h-5 text-gray-700" />
         </button>
 
         {isMenuOpen && (
-          <div className="absolute top-full left-0 mt-2 w-64 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none text-right">
+          <div className="absolute top-full left-0 mt-2 w-64 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5">
             <div
               onClick={handleUserNameClick}
-              className="px-4 py-3 border-b text-gray-900 font-semibold select-none cursor-pointer flex items-center gap-2"
-              title="رفتن به داشبورد"
+              className="px-4 py-3 border-b text-gray-900 font-semibold cursor-pointer flex items-center gap-2"
             >
               <User className="w-5 h-5 text-gray-700" />
               <span>{userName || userPhone || "کاربر گرامی"}</span>
@@ -94,48 +87,39 @@ export default function AccountActions() {
                 <Link
                   href="/orders"
                   className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100"
-                  onClick={() => setIsMenuOpen(false)}
                 >
-                  <ShoppingCart className="w-5 h-5" />
-                  سفارش‌ها
+                  <ShoppingCart className="w-5 h-5" /> سفارش‌ها
                 </Link>
               </li>
               <li>
                 <Link
                   href="/user/addresses"
                   className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100"
-                  onClick={() => setIsMenuOpen(false)}
                 >
-                  <MapPin className="w-5 h-5" />
-                  آدرس‌ها
+                  <MapPin className="w-5 h-5" /> آدرس‌ها
                 </Link>
               </li>
               <li>
                 <Link
                   href="/user/favorites"
                   className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100"
-                  onClick={() => setIsMenuOpen(false)}
                 >
-                  <Heart className="w-5 h-5" />
-                  لیست علاقه‌مندی‌ها
+                  <Heart className="w-5 h-5" /> علاقه‌مندی‌ها
                 </Link>
               </li>
               <li>
                 <Link
                   href="/user/reviews"
                   className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100"
-                  onClick={() => setIsMenuOpen(false)}
                 >
-                  <MessageSquare className="w-5 h-5" />
-                  دیدگاه‌ها و پرسش‌ها
+                  <MessageSquare className="w-5 h-5" /> دیدگاه‌ها
                 </Link>
               </li>
               <li
                 onClick={handleLogout}
                 className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 cursor-pointer text-red-600"
               >
-                <LogOut className="w-5 h-5" />
-                خروج از حساب کاربری
+                <LogOut className="w-5 h-5" /> خروج
               </li>
             </ul>
           </div>
@@ -145,13 +129,12 @@ export default function AccountActions() {
   }
 
   return (
-    <Link href="/auth/login">
+    <Link href={`/auth/login?redirect=${encodeURIComponent(pathname)}`}>
       <Button
         variant="outline"
         className="text-sm h-9 px-3 rounded-md flex items-center gap-2"
       >
-        <LogIn className="w-4 h-4" />
-        <span>ورود | ثبت‌نام</span>
+        <LogIn className="w-4 h-4" /> <span>ورود | ثبت‌نام</span>
       </Button>
     </Link>
   );

@@ -45,8 +45,8 @@ class FavoriteProductSerializer(serializers.ModelSerializer):
 
 
 class FrequentPurchaseSerializer(serializers.Serializer):
-    product_id = serializers.IntegerField(source="product_id")
-    product_name = serializers.CharField(source="product_name")
+    product_id = serializers.IntegerField()
+    product_name = serializers.CharField()
     count = serializers.IntegerField()
 
 

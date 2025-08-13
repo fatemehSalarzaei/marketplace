@@ -51,12 +51,24 @@ apiClient.interceptors.response.use(
 
           return apiClient(originalRequest)
         } catch (refreshError) {
-          // اگر رفرش هم شکست خورد، کوکی‌ها را حذف و به login هدایت کن (در صورت نیاز)
+          // اگر رفرش هم شکست خورد
           Cookies.remove('access_token')
           Cookies.remove('refresh_token')
-          // مثلاً: window.location.href = '/login'
+
+          // مسیر فعلی رو ذخیره کن
+          const currentPath = window.location.pathname + window.location.search
+          localStorage.setItem('redirect_after_login', currentPath)
+
+          // هدایت به صفحه لاگین با redirect query
+          window.location.href = `/auth/login?redirect=${encodeURIComponent(currentPath)}`
+
           return Promise.reject(refreshError)
         }
+      } else {
+        // هیچ رفرش توکنی نیست → مستقیم به لاگین
+        const currentPath = window.location.pathname + window.location.search
+        localStorage.setItem('redirect_after_login', currentPath)
+        window.location.href = `/auth/login?redirect=${encodeURIComponent(currentPath)}`
       }
     }
 

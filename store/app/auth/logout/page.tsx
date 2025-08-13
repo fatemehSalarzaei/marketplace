@@ -10,7 +10,10 @@ export default function LogoutPage() {
   useEffect(() => {
     const performLogout = async () => {
       await logoutUser()
-      router.replace('/')
+
+      // رفرش صفحه برای پاک شدن اطلاعات قبلی
+      router.replace('/')      // ریدایرکت به صفحه اصلی
+      router.refresh()         // re-render صفحه اصلی
     }
 
     performLogout()

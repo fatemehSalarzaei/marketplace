@@ -32,11 +32,14 @@ def user_dashboard(request):
 
     # 4) خریدهای پرتکرار
     frequent_products = (
-        Order.objects.filter(user=user, status__in=["delivered", "processing"])
-        .values("items__variant__product__id", "items__variant__product__name")
-        .annotate(count=models.Sum("items__quantity"))
-        .order_by("-count")[:10]
-    )
+            Order.objects.filter(user=user, status__in=["delivered", "processing"])
+            .values(
+                product_id=models.F("items__variant__product__id"),
+                product_name=models.F("items__variant__product__name"),
+            )
+            .annotate(count=models.Sum("items__quantity"))
+            .order_by("-count")[:10]
+        )
     frequent_data = FrequentPurchaseSerializer(frequent_products, many=True).data
 
     return Response({

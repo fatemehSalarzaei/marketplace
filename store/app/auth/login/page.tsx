@@ -1,12 +1,14 @@
-'use client';
-
+"use client";
 import LoginForm from '@/components/auth/LoginForm';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { sendLoginCode } from '@/services/auth/loginWithOtp';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const redirect = searchParams.get("redirect") || "/";
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -20,7 +22,7 @@ export default function LoginPage() {
     try {
       await sendLoginCode(phone_number);
       setMessage('کد با موفقیت ارسال شد');
-      router.push(`/auth/verify-code?phone_number=${phone_number}`);
+      router.push(`/auth/verify-code?phone_number=${phone_number}&redirect=${encodeURIComponent(redirect)}`);
     } catch {
       setError('ارسال کد با خطا مواجه شد.');
     } finally {
