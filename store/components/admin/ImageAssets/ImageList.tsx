@@ -4,8 +4,10 @@ import React, { useEffect, useState, useRef } from 'react';
 import { ImageAsset, ImageAssetPaginatedResponse } from '@/types/admin/media/imageAsset';
 import { getImages } from '@/services/admin/imageAsset/imageAssetService';
 import AddImageDialog from './AddImageDialog';
+import { useAuth } from '@/context/AuthContext';
 
 const ImageList = () => {
+  const { hasPermission, loadingPermissions } = useAuth();
   const [images, setImages] = useState<ImageAsset[]>([]);
   const [loading, setLoading] = useState(false);
   const [showAddDialog, setShowAddDialog] = useState(false);
@@ -34,23 +36,22 @@ const ImageList = () => {
         setImages((prev) => [...prev, ...data.results]);
       }
 
-      // بررسی وجود صفحه بعد
       setHasNextPage(data.results.length > 0);
     } finally {
       setLoading(false);
     }
   };
 
+  // بارگذاری داده‌ها فقط در صورت داشتن مجوز read
   useEffect(() => {
-    setPage(1);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
+    if (hasPermission('imageasset', 'read')) {
+      setPage(1);
       fetchImages(true);
-    }, 500);
-  }, [search]);
+    }
+  }, [loadingPermissions, search]);
 
   useEffect(() => {
-    if (page > 1) fetchImages();
+    if (page > 1 && hasPermission('imageasset', 'read')) fetchImages();
   }, [page]);
 
   // Infinite Scroll
@@ -71,6 +72,10 @@ const ImageList = () => {
     };
   }, [loading, hasNextPage]);
 
+  if (!hasPermission('imageasset', 'read')) {
+    return <p className="text-center text-red-600 mt-10">شما دسترسی لازم برای مشاهده تصاویر را ندارید.</p>;
+  }
+
   return (
     <div style={{ padding: '24px' }}>
       {/* Header: Title & Add Button */}
@@ -83,19 +88,21 @@ const ImageList = () => {
         }}
       >
         <h1 style={{ margin: 0 }}>مدیریت تصاویر</h1>
-        <button
-          onClick={() => setShowAddDialog(true)}
-          style={{
-            backgroundColor: '#007bff',
-            color: '#fff',
-            padding: '8px 16px',
-            borderRadius: '6px',
-            border: 'none',
-            cursor: 'pointer',
-          }}
-        >
-          افزودن تصویر جدید
-        </button>
+        {hasPermission('imageasset', 'create') && (
+          <button
+            onClick={() => setShowAddDialog(true)}
+            style={{
+              backgroundColor: '#007bff',
+              color: '#fff',
+              padding: '8px 16px',
+              borderRadius: '6px',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            افزودن تصویر جدید
+          </button>
+        )}
       </div>
 
       {/* Search Input */}
@@ -151,7 +158,6 @@ const ImageList = () => {
                   }}
                 />
                 <h3 style={{ fontSize: '1rem', marginBottom: 4 }}>{img.title}</h3>
-                {/* می‌تونی فیلد توضیح هم اینجا اضافه کنی در صورت وجود */}
               </div>
             ))}
           </div>
@@ -159,7 +165,7 @@ const ImageList = () => {
         {loading && <p style={{ marginTop: 16 }}>در حال بارگذاری...</p>}
       </div>
 
-      {showAddDialog && (
+      {showAddDialog && hasPermission('imageasset', 'create') && (
         <AddImageDialog
           onClose={() => {
             setShowAddDialog(false);

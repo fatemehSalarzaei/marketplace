@@ -4,15 +4,19 @@ import React, { useEffect, useState } from 'react'
 import { getPaymentGateways, togglePaymentGatewayStatus } from '@/services/admin/paymentGateway/paymentGatewayService'
 import { PaymentGateway } from '@/types/admin/paymentGateway/paymentGatewayTypes'
 import ConfirmDialog from './ConfirmDialog'
+import { useAuth } from '@/context/AuthContext'
 
 export default function PaymentGatewayList() {
+  const { hasPermission, loadingPermissions } = useAuth()
   const [gateways, setGateways] = useState<PaymentGateway[]>([])
   const [selectedGateway, setSelectedGateway] = useState<PaymentGateway | null>(null)
   const [showDialog, setShowDialog] = useState(false)
 
   useEffect(() => {
-    loadGateways()
-  }, [])
+    if (hasPermission('paymentgateway', 'read')) {
+      loadGateways()
+    }
+  }, [loadingPermissions])
 
   const loadGateways = async () => {
     try {
@@ -24,12 +28,13 @@ export default function PaymentGatewayList() {
   }
 
   const handleToggle = (gateway: PaymentGateway) => {
+    if (!hasPermission('paymentgateway', 'update')) return
     setSelectedGateway(gateway)
     setShowDialog(true)
   }
 
   const confirmToggle = async () => {
-    if (selectedGateway) {
+    if (selectedGateway && hasPermission('paymentgateway', 'update')) {
       try {
         await togglePaymentGatewayStatus(selectedGateway.id, selectedGateway.is_active)
         await loadGateways()
@@ -39,6 +44,10 @@ export default function PaymentGatewayList() {
     }
     setShowDialog(false)
     setSelectedGateway(null)
+  }
+
+  if (!hasPermission('paymentgateway', 'read')) {
+    return <p className="text-center text-red-600 mt-10">شما دسترسی لازم برای مشاهده درگاه‌ها را ندارید.</p>
   }
 
   return (
@@ -62,12 +71,16 @@ export default function PaymentGatewayList() {
               <td className="p-2">{gateway.description}</td>
               <td className="p-2">{gateway.is_active ? 'فعال' : 'غیرفعال'}</td>
               <td className="p-2">
-                <button
-                  onClick={() => handleToggle(gateway)}
-                  className={`px-3 py-1 rounded text-white ${gateway.is_active ? 'bg-red-500' : 'bg-green-500'}`}
-                >
-                  {gateway.is_active ? 'غیرفعال‌سازی' : 'فعال‌سازی'}
-                </button>
+                {hasPermission('paymentgateway', 'update') ? (
+                  <button
+                    onClick={() => handleToggle(gateway)}
+                    className={`px-3 py-1 rounded text-white ${gateway.is_active ? 'bg-red-500' : 'bg-green-500'}`}
+                  >
+                    {gateway.is_active ? 'غیرفعال‌سازی' : 'فعال‌سازی'}
+                  </button>
+                ) : (
+                  <span className="text-gray-400">عدم دسترسی</span>
+                )}
               </td>
             </tr>
           ))}
