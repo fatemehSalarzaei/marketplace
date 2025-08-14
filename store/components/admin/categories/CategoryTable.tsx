@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { Category } from "@/types/admin/categories/category";
+import { useAuth } from "@/context/AuthContext";
 
 interface Props {
   categories: Category[];
@@ -12,15 +13,10 @@ interface Props {
   onRequestDelete: (id: number) => void;
 }
 
-export default function CategoryTable({
-  categories,
-  page,
-  totalCount,
-  onPageChange,
-  onRequestDelete,
-}: Props) {
+export default function CategoryTable({ categories, page, totalCount, onPageChange, onRequestDelete }: Props) {
   const totalPages = Math.ceil(totalCount / 10);
   const fallbackImage = "/images/default-category.png";
+  const { hasPermission } = useAuth();
 
   return (
     <div className="overflow-x-auto">
@@ -37,10 +33,7 @@ export default function CategoryTable({
         </thead>
         <tbody>
           {categories.map((cat) => (
-            <tr
-              key={cat.id}
-              className="bg-white border border-gray-200 hover:bg-gray-50"
-            >
+            <tr key={cat.id} className="bg-white border border-gray-200 hover:bg-gray-50">
               <td className="px-4 py-2">
                 {cat.image ? (
                   <img
@@ -55,26 +48,20 @@ export default function CategoryTable({
               </td>
               <td className="px-4 py-2">{cat.name}</td>
               <td className="px-4 py-2">{cat.parent?.name || "-"}</td>
-              <td className="px-4 py-2">
-                {cat.is_active ? "فعال" : "غیرفعال"}
-              </td>
-              <td className="px-4 py-2">
-                {new Date(cat.created_at).toLocaleDateString("fa-IR")}
-              </td>
+              <td className="px-4 py-2">{cat.is_active ? "فعال" : "غیرفعال"}</td>
+              <td className="px-4 py-2">{new Date(cat.created_at).toLocaleDateString("fa-IR")}</td>
               <td className="px-4 py-2">
                 <div className="flex gap-2">
-                  <Link
-                    href={`/admin/categories/edit/${cat.id}`}
-                    className="text-blue-600 hover:text-blue-800"
-                  >
-                    <PencilSquareIcon className="w-5 h-5" />
-                  </Link>
-                  <button
-                    className="text-red-600 hover:text-red-800"
-                    onClick={() => onRequestDelete(cat.id)}
-                  >
-                    <TrashIcon className="w-5 h-5" />
-                  </button>
+                  {hasPermission("category", "update") && (
+                    <Link href={`/admin/categories/edit/${cat.id}`} className="text-blue-600 hover:text-blue-800">
+                      <PencilSquareIcon className="w-5 h-5" />
+                    </Link>
+                  )}
+                  {hasPermission("category", "delete") && (
+                    <button onClick={() => onRequestDelete(cat.id)} className="text-red-600 hover:text-red-800">
+                      <TrashIcon className="w-5 h-5" />
+                    </button>
+                  )}
                 </div>
               </td>
             </tr>
@@ -82,15 +69,12 @@ export default function CategoryTable({
         </tbody>
       </table>
 
-      {/* صفحه‌بندی */}
       <div className="flex justify-center mt-6">
         {Array.from({ length: totalPages }, (_, i) => (
           <button
             key={i + 1}
             className={`mx-1 px-3 py-1 rounded border ${
-              page === i + 1
-                ? "bg-blue-500 text-white"
-                : "bg-white text-gray-700 border-gray-300"
+              page === i + 1 ? "bg-blue-500 text-white" : "bg-white text-gray-700 border-gray-300"
             }`}
             onClick={() => onPageChange(i + 1)}
           >
