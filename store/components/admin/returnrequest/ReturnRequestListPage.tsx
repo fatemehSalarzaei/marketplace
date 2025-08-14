@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '@/context/AuthContext'
 
 import ReturnRequestFilterPanel from './ReturnRequestFilterPanel'
 import ReturnRequestTable from './ReturnRequestTable'
@@ -11,6 +12,7 @@ import { getReturnRequests } from '@/services/admin/returnRequests/returnRequest
 
 export default function ReturnRequestListPage() {
   const router = useRouter()
+  const { hasPermission } = useAuth()
 
   const [filters, setFilters] = useState<{ status?: string; query?: string }>({})
   const [data, setData] = useState<IReturnRequestSummary[]>([])
@@ -19,7 +21,12 @@ export default function ReturnRequestListPage() {
   const [totalCount, setTotalCount] = useState(0)
 
   useEffect(() => {
-    fetchData()
+    if (hasPermission('returnrequest', 'read')) {
+      fetchData()
+    } else {
+      setData([])
+      setTotalCount(0)
+    }
   }, [filters, page])
 
   const fetchData = async () => {
@@ -56,7 +63,13 @@ export default function ReturnRequestListPage() {
   }
 
   const handleSelect = (id: number) => {
-    router.push(`/admin/return-requests/${id}`)
+    if (hasPermission('returnrequest', 'read')) {
+      router.push(`/admin/return-requests/${id}`)
+    }
+  }
+
+  if (!hasPermission('returnrequest', 'read')) {
+    return <p className="text-red-600 text-center py-10">شما مجوز مشاهده درخواست‌های مرجوعی را ندارید.</p>
   }
 
   return (
