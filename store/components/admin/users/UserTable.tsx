@@ -3,13 +3,11 @@
 import { User } from "@/types/admin/users/user";
 import { useRouter } from "next/navigation";
 import { toJalaali } from "jalaali-js";
+import { useAuth } from "@/context/AuthContext";
+import { useMemo } from "react";
 
 interface UserTableProps {
   users: User[];
-  isEditable?: boolean; // ادمین امکان ویرایش دارد
-  isViewable?: boolean; // کاربران عادی امکان مشاهده دارند
-  editButtonText?: string; // متن دکمه ویرایش
-  viewButtonText?: string; // متن دکمه مشاهده
 }
 
 const formatToJalali = (dateString: string) => {
@@ -20,23 +18,21 @@ const formatToJalali = (dateString: string) => {
     .padStart(2, "0")}`;
 };
 
-export default function UserTable({
-  users,
-  isEditable = false,
-  isViewable = false,
-  editButtonText = "ویرایش",
-  viewButtonText = "مشاهده",
-}: UserTableProps) {
+export default function UserTable({ users }: UserTableProps) {
   const router = useRouter();
-  const totalPages = Math.ceil(users.length / 10); // اگر صفحه بندی داری بهتر حساب کنی
+  const { permissions: rawPermissions } = useAuth();
 
-  const handleEdit = (id: number) => {
-    router.push(`/admin/admin-users/${id}`);
-  };
+  const permissions = useMemo(() => {
+    const userPerm = rawPermissions?.find((p) => p.model.code === "user");
+    return {
+      canViewUser: !!userPerm?.can_read,
+      canEditUser: !!userPerm?.can_update,
+    };
+  }, [rawPermissions]);
 
-  const handleView = (id: number) => {
-    router.push(`/admin/regular-users/${id}`);
-  };
+  if (!rawPermissions) return <p className="text-center mt-10">در حال بارگذاری...</p>;
+  if (!permissions.canViewUser && !permissions.canEditUser)
+    return <p className="text-center text-red-600 mt-10">دسترسی به کاربران وجود ندارد.</p>;
 
   return (
     <div className="overflow-x-auto">
@@ -48,47 +44,37 @@ export default function UserTable({
             <th className="px-4 py-2 text-right">ایمیل</th>
             <th className="px-4 py-2 text-right">فعال</th>
             <th className="px-4 py-2 text-right">تاریخ عضویت</th>
-            {(isEditable || isViewable) && (
+            {(permissions.canEditUser || permissions.canViewUser) && (
               <th className="px-4 py-2 text-center">عملیات</th>
             )}
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
-          {users.length === 0 && (
-            <tr>
-              <td
-                colSpan={isEditable || isViewable ? 6 : 5}
-                className="text-center py-4 text-gray-500"
-              >
-                کاربری یافت نشد.
-              </td>
-            </tr>
-          )}
           {users.map((user) => (
             <tr key={user.id}>
               <td className="px-4 py-2">{user.first_name}</td>
               <td className="px-4 py-2">{user.last_name}</td>
               <td className="px-4 py-2">{user.email || "-"}</td>
-              <td className="px-4 py-2">
-                {user.is_active ? "فعال" : "غیرفعال"}
-              </td>
+              <td className="px-4 py-2">{user.is_active ? "فعال" : "غیرفعال"}</td>
               <td className="px-4 py-2">{formatToJalali(user.date_joined)}</td>
-              {(isEditable || isViewable) && (
+              {(permissions.canEditUser || permissions.canViewUser) && (
                 <td className="px-4 py-2 text-center space-x-2">
-                  {isEditable && (
+                  {permissions.canEditUser && (
                     <button
                       className="text-blue-600 hover:underline"
-                      onClick={() => handleEdit(user.id)}
+                      onClick={() => router.push(`/admin/admin-users/${user.id}`)}
                     >
-                      {editButtonText}
+                      ویرایش
                     </button>
                   )}
-                  {isViewable && (
+                  {permissions.canViewUser && (
                     <button
                       className="text-gray-700 hover:underline"
-                      onClick={() => handleView(user.id)}
+                      onClick={() =>
+                        router.push(`/admin/regular-users/${user.id}`)
+                      }
                     >
-                      {viewButtonText}
+                      مشاهده
                     </button>
                   )}
                 </td>

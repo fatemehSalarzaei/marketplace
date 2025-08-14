@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from Accounts.Serializers import MyRolePermissionSerializer
 from Accounts.models import RoleModelPermission
+from rest_framework import status
+from django.db.models import Q
 
 class MyRoleAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -14,17 +16,19 @@ class MyRoleAPIView(APIView):
 
         if not role:
             return Response({
-                "detail": "این کاربر نقشی ندارد."
-            }, status=404)
+                "role": None,
+                "permissions": []
+            }, status=status.HTTP_200_OK)  
 
         permissions = RoleModelPermission.objects.filter(
             role=role,
-        ).filter(
-            models.Q(can_create=True) |
-            models.Q(can_read=True) |
-            models.Q(can_update=True) |
-            models.Q(can_delete=True)
-        )
+            ).filter(
+                Q(can_create=True) |
+                Q(can_read=True) |
+                Q(can_update=True) |
+                Q(can_delete=True)
+            )
+
 
         serializer = MyRolePermissionSerializer(permissions, many=True)
 

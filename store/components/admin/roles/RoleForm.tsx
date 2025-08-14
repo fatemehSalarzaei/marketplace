@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { modelTranslations } from "@/constants/modelTranslations";
 import { Checkbox } from "@/components/ui/Checkbox";
+import { modelTranslations } from "@/constants/modelTranslations";
 import { createRole, updateRole } from "@/services/admin/roles/roleService";
 import { getModelAccessPermissions } from "@/services/admin/roles/permissionService";
 
@@ -38,26 +40,29 @@ interface Props {
       model: Permission;
     }>;
   };
-  onSuccess?: () => void;
   isEdit?: boolean;
   roleId?: number;
+  onSuccess?: () => void;
 }
 
-export default function RoleForm({
-  initialData,
-  onSuccess,
-  isEdit = false,
-  roleId,
-}: Props) {
-  const [formData, setFormData] = useState<RoleFormData>({
-    name: "",
-    permissions: {},
-  });
+export default function RoleForm({ initialData, isEdit = false, roleId, onSuccess }: Props) {
+  const { hasPermission, loadingPermissions } = useAuth();
+  const router = useRouter();
 
+  const [formData, setFormData] = useState<RoleFormData>({ name: "", permissions: {} });
   const [models, setModels] = useState<Permission[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // دریافت مدل‌ها یکبار
+  // بررسی مجوز دسترسی
+  useEffect(() => {
+    if (!loadingPermissions) {
+      const permission = isEdit ? "update" : "create";
+      if (!hasPermission("role", permission)) {
+        router.push("/admin/403");
+      }
+    }
+  }, [hasPermission, isEdit, loadingPermissions, router]);
+
   useEffect(() => {
     getModelAccessPermissions()
       .then((res) => {
@@ -66,56 +71,34 @@ export default function RoleForm({
         );
         setModels(filteredModels);
       })
-      .catch((error) => {
-        console.error("خطا در دریافت مدل‌ها:", error);
-      });
+      .catch((error) => console.error("خطا در دریافت مدل‌ها:", error));
   }, []);
 
-  // مقداردهی اولیه فرم بر اساس مدل‌ها و داده ویرایشی
   useEffect(() => {
     if (models.length === 0) return;
 
-    // مجوزهای پیش‌فرض با false
     const defaultPermissions = models.reduce((acc: any, model: Permission) => {
-      acc[model.code] = {
-        view: false,
-        add: false,
-        change: false,
-        delete: false,
-      };
+      acc[model.code] = { view: false, add: false, change: false, delete: false };
       return acc;
     }, {});
 
-    // اگر داده ویرایشی داریم، مجوزها را تبدیل به فرم مناسب می‌کنیم
     let permissionsFromInitial: RoleFormData["permissions"] = {};
-
-    if (initialData?.permissions && initialData.permissions.length > 0) {
-      // هر مجوز را بر اساس مدل مربوطه تبدیل می‌کنیم
-      permissionsFromInitial = initialData.permissions.reduce(
-        (acc: any, perm) => {
-          const model = perm.model;
-          if (!model || !model.code) return acc;
-          acc[model.code] = {
-            view: perm.can_read,
-            add: perm.can_create,
-            change: perm.can_update,
-            delete: perm.can_delete,
-          };
-          return acc;
-        },
-        {}
-      );
+    if (initialData?.permissions?.length > 0) {
+      permissionsFromInitial = initialData.permissions.reduce((acc: any, perm) => {
+        if (!perm.model?.code) return acc;
+        acc[perm.model.code] = {
+          view: perm.can_read,
+          add: perm.can_create,
+          change: perm.can_update,
+          delete: perm.can_delete,
+        };
+        return acc;
+      }, {});
     }
-
-    // ادغام مجوزهای اولیه با پیش‌فرض (تا همه مدل‌ها حتما باشند)
-    const mergedPermissions = {
-      ...defaultPermissions,
-      ...permissionsFromInitial,
-    };
 
     setFormData({
       name: initialData?.name || "",
-      permissions: mergedPermissions,
+      permissions: { ...defaultPermissions, ...permissionsFromInitial },
     });
   }, [models, initialData]);
 
@@ -124,35 +107,25 @@ export default function RoleForm({
       ...prev,
       permissions: {
         ...prev.permissions,
-        [modelCode]: {
-          ...prev.permissions[modelCode],
-          [action]: !prev.permissions[modelCode][action],
-        },
+        [modelCode]: { ...prev.permissions[modelCode], [action]: !prev.permissions[modelCode][action] },
       },
     }));
   };
 
   const handleSubmit = async () => {
     setLoading(true);
+    const model_permissions = Object.entries(formData.permissions).map(([modelCode, perms]) => {
+      const model = models.find((m) => m.code === modelCode);
+      return {
+        model_id: model?.id,
+        can_create: perms.add,
+        can_read: perms.view,
+        can_update: perms.change,
+        can_delete: perms.delete,
+      };
+    });
 
-    // تبدیل permissions به آرایه model_permissions برای API
-    const model_permissions = Object.entries(formData.permissions).map(
-      ([modelCode, perms]) => {
-        const model = models.find((m) => m.code === modelCode);
-        return {
-          model_id: model?.id,
-          can_create: perms.add,
-          can_read: perms.view,
-          can_update: perms.change,
-          can_delete: perms.delete,
-        };
-      }
-    );
-
-    const payload = {
-      name: formData.name,
-      model_permissions,
-    };
+    const payload = { name: formData.name, model_permissions };
 
     try {
       if (isEdit && roleId) {
@@ -167,13 +140,11 @@ export default function RoleForm({
     setLoading(false);
   };
 
+  if (loadingPermissions) return <p>در حال بررسی مجوزها...</p>;
+
   return (
     <div className="space-y-6">
-      <Input
-        placeholder="نام نقش"
-        value={formData.name}
-        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-      />
+      <Input placeholder="نام نقش" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
 
       <table className="w-full text-right border border-gray-200 text-sm">
         <thead>
@@ -188,18 +159,12 @@ export default function RoleForm({
         <tbody>
           {models.map((model) => (
             <tr key={model.id}>
-              <td className="border p-2">
-                {modelTranslations[model.code] || model.name}
-              </td>
+              <td className="border p-2">{modelTranslations[model.code] || model.name}</td>
               {["view", "add", "change", "delete"].map((action) => (
                 <td key={action} className="border text-center">
                   <Checkbox
-                    checked={
-                      formData.permissions[model.code]?.[action] || false
-                    }
-                    onCheckedChange={() =>
-                      handleCheckboxChange(model.code, action)
-                    }
+                    checked={formData.permissions[model.code]?.[action] || false}
+                    onCheckedChange={() => handleCheckboxChange(model.code, action)}
                   />
                 </td>
               ))}
@@ -209,13 +174,7 @@ export default function RoleForm({
       </table>
 
       <Button onClick={handleSubmit} disabled={loading}>
-        {loading
-          ? isEdit
-            ? "در حال ویرایش..."
-            : "در حال ارسال..."
-          : isEdit
-          ? "ویرایش نقش"
-          : "ایجاد نقش"}
+        {loading ? (isEdit ? "در حال ویرایش..." : "در حال ارسال...") : isEdit ? "ویرایش نقش" : "ایجاد نقش"}
       </Button>
     </div>
   );

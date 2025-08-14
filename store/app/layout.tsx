@@ -1,22 +1,13 @@
+// app/layout.tsx یا RootLayout
 "use client";
 
 import "../styles/globals.css";
-import { ReactNode, useEffect } from "react";
+import { ReactNode } from "react";
 import Header from "@/components/header/Header";
 import Footer from "@/components/layout/Footer";
 import { usePathname } from "next/navigation";
 import { CartProvider } from "@/context/CartContext";
-import { ToastProvider, useToast } from "@/context/ToastContext";
-import ToastRenderer from "@/context/ToastRenderer";
-import { setToastCallback } from "@/lib/toastCallback";
-
-const ToastSetup: React.FC = () => {
-  const { addToast } = useToast();
-  useEffect(() => {
-    setToastCallback(addToast);
-  }, [addToast]);
-  return null;
-};
+import { AuthProvider } from "@/context/AuthContext";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -26,15 +17,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="fa" dir="rtl">
       <body className="font-iranyekan bg-white text-gray-900 flex flex-col min-h-screen">
-        <CartProvider>
-          <ToastProvider>
-            <ToastSetup />
+        <AuthProvider>
+          <CartProvider>
             {!isAuthPage && !isAdminPage && <Header />}
             <main className="w-full flex-grow p-0 m-0">{children}</main>
             {!isAuthPage && !isAdminPage && <Footer />}
-            <ToastRenderer />
-          </ToastProvider>
-        </CartProvider>
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

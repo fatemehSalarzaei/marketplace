@@ -18,11 +18,13 @@ import {
   BarChart2,
   Edit3,
 } from "lucide-react";
-import { logoutUser } from "@/services/auth/logout"; // اینجا مسیر سرویس logout
+import { logoutUser } from "@/services/auth/logout";
+import { useAuth } from "@/context/AuthContext";
 
 export default function AdminSidebarMenu() {
   const pathname = usePathname();
   const router = useRouter();
+  const { hasPermission } = useAuth();
 
   const [user, setUser] = useState({ fullName: "", phone: "" });
   const [openMenus, setOpenMenus] = useState<string[]>([]);
@@ -42,11 +44,11 @@ export default function AdminSidebarMenu() {
   const handleLogout = async (e: React.MouseEvent) => {
     e.preventDefault();
     try {
-      await logoutUser(); // فراخوانی API خروج
+      await logoutUser();
       localStorage.removeItem("access_token");
       localStorage.removeItem("full_name");
       localStorage.removeItem("phone_numbers");
-      router.replace("/auth/login"); // ریدایرکت بعد از خروج
+      router.replace("/auth/login");
     } catch (err) {
       console.error("خطا در خروج:", err);
     }
@@ -62,10 +64,10 @@ export default function AdminSidebarMenu() {
       icon: Users,
       key: "users",
       children: [
-        { label: "کاربران سایت", href: "/admin/regular-users" },
-        { label: "کاربران ادمین", href: "/admin/admin-users" },
-        { label: "نقش‌ها", href: "/admin/roles" },
-        { label: "گزارشات کاربران", href: "/admin/users/reports" },
+        { label: "کاربران سایت", href: "/admin/regular-users", model: "user" },
+        { label: "کاربران ادمین", href: "/admin/admin-users", model: "user" },
+        { label: "نقش‌ها", href: "/admin/roles", model: "role" },
+        { label: "گزارشات کاربران", href: "/admin/users/reports", model: "userreport" },
       ],
     },
     {
@@ -73,10 +75,10 @@ export default function AdminSidebarMenu() {
       icon: Box,
       key: "products",
       children: [
-        { label: "لیست محصولات", href: "/admin/products" },
-        { label: "دسته‌بندی‌ها", href: "/admin/categories" },
-        { label: "برندها", href: "/admin/brands" },
-        { label: "خصوصیات محصولات", href: "/admin/product-attributes" },
+        { label: "لیست محصولات", href: "/admin/products", model: "product" },
+        { label: "دسته‌بندی‌ها", href: "/admin/categories", model: "category" },
+        { label: "برندها", href: "/admin/brands", model: "brand" },
+        { label: "خصوصیات محصولات", href: "/admin/product-attributes", model: "productattribute" },
       ],
     },
     {
@@ -84,25 +86,25 @@ export default function AdminSidebarMenu() {
       icon: ShoppingCart,
       key: "orders",
       children: [
-        { label: "سفارشات", href: "/admin/orders" },
-        { label: "درخواست‌های مرجوعی", href: "/admin/return-requests" },
-        { label: "فاکتورها", href: "/admin/invoices" },
-        { label: "پرداخت‌ها", href: "/admin/payments" },
+        { label: "سفارشات", href: "/admin/orders", model: "order" },
+        { label: "درخواست‌های مرجوعی", href: "/admin/return-requests", model: "returnrequest" },
+        { label: "فاکتورها", href: "/admin/invoices", model: "invoice" },
+        { label: "پرداخت‌ها", href: "/admin/payments", model: "payment" },
       ],
     },
     {
       label: "مدیریت اعلان‌ها",
       icon: Bell,
       key: "notifications",
-      children: [{ label: "لیست اعلان‌ها", href: "/admin/notifications" }],
+      children: [{ label: "لیست اعلان‌ها", href: "/admin/notifications", model: "notification" }],
     },
     {
       label: "حمل‌ونقل و پرداخت",
       icon: Truck,
       key: "shipping",
       children: [
-        { label: "شیوه‌های ارسال", href: "/admin/shipping-methods" },
-        { label: "درگاه‌های پرداخت", href: "/admin/payment-gateways" },
+        { label: "شیوه‌های ارسال", href: "/admin/shipping-methods", model: "shippingmethod" },
+        { label: "درگاه‌های پرداخت", href: "/admin/payment-gateways", model: "paymentgateway" },
       ],
     },
     {
@@ -110,9 +112,9 @@ export default function AdminSidebarMenu() {
       icon: Image,
       key: "media",
       children: [
-        { label: "تصاویر", href: "/admin/image-assets" },
-        { label: "ویدیوها", href: "/admin/video-assets" },
-        { label: "بنرها", href: "/admin/banners" },
+        { label: "تصاویر", href: "/admin/image-assets", model: "imageasset" },
+        { label: "ویدیوها", href: "/admin/video-assets", model: "videoasset" },
+        { label: "بنرها", href: "/admin/banners", model: "banner" },
       ],
     },
     {
@@ -120,34 +122,25 @@ export default function AdminSidebarMenu() {
       icon: Ticket,
       key: "support",
       children: [
-        { label: "نظرات کاربران", href: "/admin/support/reviews" },
-        { label: "لیست تیکت‌ها", href: "/admin/support/tickets" },
-        { label: "دسته‌بندی پشتیبانی", href: "/admin/support/categories" },
+        { label: "نظرات کاربران", href: "/admin/support/reviews", model: "review" },
+        { label: "لیست تیکت‌ها", href: "/admin/support/tickets", model: "ticket" },
+        { label: "دسته‌بندی پشتیبانی", href: "/admin/support/categories", model: "supportcategory" },
       ],
     },
     {
       label: "صفحه اصلی سایت",
       icon: Home,
       key: "homepage",
-      children: [{ label: "المان‌ها", href: "/admin/page-builder/elements" }],
+      children: [{ label: "المان‌ها", href: "/admin/page-builder/elements", model: "pageelement" }],
     },
     {
       label: "گزارشات و آمار",
       icon: BarChart2,
       key: "reports",
       children: [
-        {
-          label: "گزارشات فروش و محصولات",
-          href: "/admin/reports/sales-products",
-        },
-        {
-          label: "گزارشات مشتریان و کانال‌ها",
-          href: "/admin/reports/customers-channels",
-        },
-        {
-          label: "گزارشات مالی و لجستیک",
-          href: "/admin/reports/finance-logistics",
-        },
+        { label: "گزارشات فروش و محصولات", href: "/admin/reports/sales-products", model: "salesreport" },
+        { label: "گزارشات مشتریان و کانال‌ها", href: "/admin/reports/customers-channels", model: "customerreport" },
+        { label: "گزارشات مالی و لجستیک", href: "/admin/reports/finance-logistics", model: "financereport" },
       ],
     },
     {
@@ -157,9 +150,33 @@ export default function AdminSidebarMenu() {
     },
   ];
 
+  // ✅ فیلتر کردن آیتم‌ها با حداقل یک مجوز
+  const filteredMenu = menuItems
+    .map((item) => {
+      if (item.isLogout) return item;
+
+      if (item.children) {
+        const allowedChildren = item.children.filter((child) =>
+          ["create", "read", "update", "delete"].some((perm) =>
+            hasPermission(child.model, perm)
+          )
+        );
+        return allowedChildren.length > 0 ? { ...item, children: allowedChildren } : null;
+      }
+
+      if (item.model) {
+        const allowed = ["create", "read", "update", "delete"].some((perm) =>
+          hasPermission(item.model, perm)
+        );
+        return allowed ? item : null;
+      }
+
+      return null;
+    })
+    .filter(Boolean);
+
   return (
     <nav className="flex flex-col h-full bg-white border-l border-gray-200 text-right rtl p-4">
-      {/* اطلاعات کاربر */}
       <div className="mb-6 px-4 py-3 border-b border-gray-300 flex items-center justify-between">
         <span className="font-semibold text-gray-800 truncate ml-10">
           {user.fullName || user.phone || "کاربر مهمان"}
@@ -174,9 +191,8 @@ export default function AdminSidebarMenu() {
         </button>
       </div>
 
-      {/* منوها */}
       <div className="flex flex-col gap-1 overflow-y-auto">
-        {menuItems.map((item) => {
+        {filteredMenu.map((item) => {
           const isActive =
             item.href &&
             (pathname === item.href || pathname.startsWith(item.href + "/"));

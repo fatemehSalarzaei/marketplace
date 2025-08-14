@@ -4,16 +4,21 @@ import Link from "next/link";
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { Role } from "@/types/admin/roles/role";
 import { modelTranslations } from "@/constants/modelTranslations";
+import { useAuth } from "@/context/AuthContext";
 
 interface Props {
   roles: Role[];
   loading: boolean;
   onDeleteClick: (role: Role) => void;
+  onEditClick: (role: Role) => void;
 }
 
-export default function RoleTable({ roles, loading, onDeleteClick }: Props) {
+export default function RoleTable({ roles, loading, onDeleteClick, onEditClick }: Props) {
+  const { hasPermission, loadingPermissions } = useAuth();
+
   if (loading) return <p>در حال بارگذاری...</p>;
   if (roles.length === 0) return <p>هیچ نقشی پیدا نشد.</p>;
+  if (loadingPermissions) return <p>در حال بررسی مجوزها...</p>;
 
   return (
     <div className="overflow-x-auto">
@@ -48,6 +53,9 @@ export default function RoleTable({ roles, loading, onDeleteClick }: Props) {
                     .join(", ") + ", ..."
                 : modelsList.map((m) => `● ${m}`).join(", ");
 
+            const canEdit = hasPermission("role", "update");
+            const canDelete = hasPermission("role", "delete");
+
             return (
               <tr
                 key={role.id}
@@ -63,18 +71,22 @@ export default function RoleTable({ roles, loading, onDeleteClick }: Props) {
                 </td>
                 <td className="px-4 py-2">
                   <div className="flex gap-2">
-                    <Link
-                      href={`/admin/roles/${role.id}/edit`}
-                      className="text-blue-600 hover:text-blue-800"
-                    >
-                      <PencilSquareIcon className="w-5 h-5" />
-                    </Link>
-                    <button
-                      className="text-red-600 hover:text-red-800"
-                      onClick={() => onDeleteClick(role)}
-                    >
-                      <TrashIcon className="w-5 h-5" />
-                    </button>
+                    {canEdit && (
+                      <button
+                        className="text-blue-600 hover:text-blue-800"
+                        onClick={() => onEditClick(role)}
+                      >
+                        <PencilSquareIcon className="w-5 h-5" />
+                      </button>
+                    )}
+                    {canDelete && (
+                      <button
+                        className="text-red-600 hover:text-red-800"
+                        onClick={() => onDeleteClick(role)}
+                      >
+                        <TrashIcon className="w-5 h-5" />
+                      </button>
+                    )}
                   </div>
                 </td>
               </tr>

@@ -1,12 +1,16 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 import { Role } from "@/types/admin/roles/role";
 import RoleListView from "@/components/admin/roles/RoleListView";
-import { useRouter } from "next/navigation";
 import { getRoles, deleteRole } from "@/services/admin/roles/roleService";
 
 export default function RoleListPage() {
+  const { hasPermission, loadingPermissions } = useAuth();
+  const router = useRouter();
+
   const [roles, setRoles] = useState<Role[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(1);
@@ -15,9 +19,15 @@ export default function RoleListPage() {
   const [error, setError] = useState<string | null>(null);
   const [roleToDelete, setRoleToDelete] = useState<Role | null>(null);
 
-  const router = useRouter();
+  // بررسی مجوز read قبل از رندر
+  useEffect(() => {
+    if (!loadingPermissions && !hasPermission("role", "read")) {
+      router.push("/admin/403");
+    }
+  }, [hasPermission, loadingPermissions, router]);
 
   const fetchRoles = useCallback(async () => {
+    if (!hasPermission("role", "read")) return;
     setLoading(true);
     setError(null);
     try {
@@ -29,11 +39,11 @@ export default function RoleListPage() {
       setError("خطا در دریافت نقش‌ها");
     }
     setLoading(false);
-  }, [page, search]);
+  }, [page, search, hasPermission]);
 
   useEffect(() => {
-    fetchRoles();
-  }, [fetchRoles]);
+    if (!loadingPermissions) fetchRoles();
+  }, [fetchRoles, loadingPermissions]);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -45,7 +55,7 @@ export default function RoleListPage() {
   };
 
   const handleConfirmDelete = async () => {
-    if (!roleToDelete) return;
+    if (!roleToDelete || !hasPermission("role", "delete")) return;
     setLoading(true);
     setError(null);
     try {
@@ -64,8 +74,18 @@ export default function RoleListPage() {
   };
 
   const handleRequestEdit = (role: Role) => {
-    router.push(`/admin/roles/${role.id}/edit`);
+    if (hasPermission("role", "update")) {
+      router.push(`/admin/roles/${role.id}/edit`);
+    }
   };
+
+  const handleCreateNew = () => {
+    if (hasPermission("role", "create")) {
+      router.push("/admin/roles/create");
+    }
+  };
+
+  if (loadingPermissions) return <p>در حال بررسی مجوزها...</p>;
 
   return (
     <RoleListView
@@ -82,7 +102,7 @@ export default function RoleListPage() {
       onRequestEdit={handleRequestEdit}
       onConfirmDelete={handleConfirmDelete}
       onCancelDelete={handleCancelDelete}
-      onCreateNew={() => router.push("/admin/roles/create")}
+      onCreateNew={handleCreateNew}
     />
   );
 }
