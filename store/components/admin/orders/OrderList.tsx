@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import { useAuth } from '@/context/AuthContext'
 import { Order, PaginatedOrders } from '@/types/admin/orders/orders'
 import { fetchAdminOrders } from '@/services/admin/orders/orders'
 import OrderRow from './OrderRow'
@@ -8,23 +9,18 @@ import Pagination from './Pagination'
 import OrderFilters from './OrderFilters'
 
 const OrderList: React.FC = () => {
+  const { hasPermission } = useAuth()
   const [ordersData, setOrdersData] = useState<PaginatedOrders | null>(null)
   const [page, setPage] = useState(1)
-  const [filters, setFilters] = useState<{
-    status?: string
-    is_paid?: boolean
-    search?: string
-  }>({})
+  const [filters, setFilters] = useState<{ status?: string; is_paid?: boolean; search?: string }>({})
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const fetchOrders = async () => {
+    if (!hasPermission('order', 'read')) return
     setLoading(true)
     try {
-      const data = await fetchAdminOrders({
-        page,
-        ...filters,
-      })
+      const data = await fetchAdminOrders({ page, ...filters })
       setOrdersData(data)
       setError(null)
     } catch {
@@ -36,19 +32,21 @@ const OrderList: React.FC = () => {
 
   useEffect(() => {
     fetchOrders()
-  }, [page, filters])
+  }, [page, filters, hasPermission])
 
   const handleFilterChange = (newFilters: typeof filters) => {
     setFilters(newFilters)
     setPage(1)
   }
 
+  if (!hasPermission('order', 'read')) {
+    return <p className="text-red-600 text-center py-4">شما دسترسی مشاهده سفارش‌ها را ندارید.</p>
+  }
+
   return (
     <div className="p-4 space-y-4">
-      {/* فیلترها */}
       <OrderFilters onFilterChange={handleFilterChange} />
 
-      {/* جدول */}
       {loading ? (
         <p>در حال بارگذاری...</p>
       ) : error ? (
@@ -63,6 +61,7 @@ const OrderList: React.FC = () => {
                 <th className="border border-gray-300 px-4 py-2">وضعیت</th>
                 <th className="border border-gray-300 px-4 py-2">قیمت نهایی</th>
                 <th className="border border-gray-300 px-4 py-2">تاریخ ایجاد</th>
+                {hasPermission('order', 'update') && <th className="border border-gray-300 px-4 py-2">عملیات</th>}
               </tr>
             </thead>
             <tbody>

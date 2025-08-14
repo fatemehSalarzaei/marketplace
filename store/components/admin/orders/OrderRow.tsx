@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Order } from "@/types/admin/orders/orders";
 import OrderItemRow from "./OrderItemRow";
+import { useAuth } from "@/context/AuthContext";
 
 interface Props {
   order: Order;
@@ -12,10 +13,13 @@ interface Props {
 const OrderRow: React.FC<Props> = ({ order }) => {
   const [showItems, setShowItems] = useState(false);
   const router = useRouter();
+  const { hasPermission } = useAuth();
 
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
-    router.push(`/admin/orders/edit/${order.id}`);
+    if (hasPermission("order", "update")) {
+      router.push(`/admin/orders/edit/${order.id}`);
+    }
   };
 
   const getPersianStatus = (status: string) => {
@@ -50,26 +54,26 @@ const OrderRow: React.FC<Props> = ({ order }) => {
         <td className="border border-gray-300 px-4 py-2">
           {order.user.first_name} {order.user.last_name}
         </td>
-        <td className="border border-gray-300 px-4 py-2">
-          {getPersianStatus(order.status)}
-        </td>
+        <td className="border border-gray-300 px-4 py-2">{getPersianStatus(order.status)}</td>
         <td className="border border-gray-300 px-4 py-2">{order.final_price}</td>
         <td className="border border-gray-300 px-4 py-2">
           {new Date(order.created_at).toLocaleDateString("fa-IR")}
         </td>
-        <td className="border border-gray-300 px-4 py-2 text-center">
-          <button
-            onClick={handleEdit}
-            className="px-3 py-1 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded"
-          >
-            ویرایش
-          </button>
-        </td>
+        {hasPermission("order", "update") && (
+          <td className="border border-gray-300 px-4 py-2 text-center">
+            <button
+              onClick={handleEdit}
+              className="px-3 py-1 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded"
+            >
+              ویرایش
+            </button>
+          </td>
+        )}
       </tr>
 
       {showItems && (
         <tr>
-          <td colSpan={6} className="p-2 bg-gray-50">
+          <td colSpan={hasPermission("order", "update") ? 6 : 5} className="p-2 bg-gray-50">
             <table className="w-full border-collapse border border-gray-300">
               <thead className="bg-gray-200">
                 <tr>
@@ -84,10 +88,7 @@ const OrderRow: React.FC<Props> = ({ order }) => {
               </thead>
               <tbody>
                 {order.items.map((item) => (
-                  <OrderItemRow
-                    key={item.title_snapshot + item.variant}
-                    item={item}
-                  />
+                  <OrderItemRow key={item.title_snapshot + item.variant} item={item} />
                 ))}
               </tbody>
             </table>
