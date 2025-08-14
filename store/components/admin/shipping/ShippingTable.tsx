@@ -1,25 +1,4 @@
-"use client";
-
-import Link from "next/link";
-import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
-
-interface ShippingMethod {
-  id: number;
-  name: string;
-  description: string;
-  cost: string;
-  min_estimated_days: number;
-  max_estimated_days: number;
-  active: boolean;
-}
-
-interface ShippingTableProps {
-  methods: ShippingMethod[];
-  page: number;
-  totalCount: number;
-  onPageChange: (page: number) => void;
-  onRequestDelete: (id: number) => void;
-}
+import { useAuth } from "@/context/AuthContext"; // اضافه شد
 
 export default function ShippingTable({
   methods,
@@ -28,6 +7,7 @@ export default function ShippingTable({
   onPageChange,
   onRequestDelete,
 }: ShippingTableProps) {
+  const { hasPermission } = useAuth(); // استفاده از هوک
   const totalPages = Math.ceil(totalCount / 10);
 
   return (
@@ -60,18 +40,22 @@ export default function ShippingTable({
                 </td>
                 <td className="px-4 py-2">
                   <div className="flex gap-2">
-                    <Link
-                      href={`/admin/shipping-methods/${method.id}/edit`}
-                      className="text-blue-600 hover:text-blue-800"
-                    >
-                      <PencilSquareIcon className="w-5 h-5" />
-                    </Link>
-                    <button
-                      className="text-red-600 hover:text-red-800"
-                      onClick={() => onRequestDelete(method.id)}
-                    >
-                      <TrashIcon className="w-5 h-5" />
-                    </button>
+                    {hasPermission("shippingmethod", "update") && (
+                      <Link
+                        href={`/admin/shipping-methods/${method.id}/edit`}
+                        className="text-blue-600 hover:text-blue-800"
+                      >
+                        <PencilSquareIcon className="w-5 h-5" />
+                      </Link>
+                    )}
+                    {hasPermission("shippingmethod", "delete") && (
+                      <button
+                        className="text-red-600 hover:text-red-800"
+                        onClick={() => onRequestDelete(method.id)}
+                      >
+                        <TrashIcon className="w-5 h-5" />
+                      </button>
+                    )}
                   </div>
                 </td>
               </tr>

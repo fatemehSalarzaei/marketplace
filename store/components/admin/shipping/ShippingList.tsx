@@ -9,8 +9,10 @@ import {
 import ShippingTable from "./ShippingTable";
 import DeleteShippingModal from "./DeleteShippingModal";
 import ShippingFilters from "./ShippingFilters";
+import { useAuth } from "@/context/AuthContext"; // اضافه شد
 
 export default function ShippingList() {
+  const { hasPermission } = useAuth(); // استفاده از هوک
   const [methods, setMethods] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -22,6 +24,7 @@ export default function ShippingList() {
 
   const fetchData = useCallback(
     async (page = 1, activeFilters = filters) => {
+      if (!hasPermission("shippingmethod", "read")) return; // بررسی مجوز خواندن
       setLoading(true);
       try {
         const data = await getShippingMethods({ page, ...activeFilters });
@@ -34,7 +37,7 @@ export default function ShippingList() {
         setLoading(false);
       }
     },
-    [filters]
+    [filters, hasPermission]
   );
 
   useEffect(() => {
@@ -42,6 +45,7 @@ export default function ShippingList() {
   }, [currentPage, filters, fetchData]);
 
   const handleDelete = async () => {
+    if (!hasPermission("shippingmethod", "delete")) return; // بررسی مجوز حذف
     if (selected) {
       await deleteShippingMethod(selected.id);
       setSelected(null);
@@ -49,7 +53,6 @@ export default function ShippingList() {
     }
   };
 
-  // مهم: استفاده از useCallback برای جلوگیری از تغییر رفرنس تابع
   const handleFilterChange = useCallback(
     (newFilters) => {
       setFilters(newFilters);
@@ -62,36 +65,46 @@ export default function ShippingList() {
     <div>
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-xl font-bold">روش‌های ارسال</h1>
-        <button
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-          onClick={() => router.push("/admin/shipping-methods/create")}
-        >
-          ایجاد روش جدید
-        </button>
+        {hasPermission("shippingmethod", "create") && ( // بررسی مجوز ایجاد
+          <button
+            className="bg-blue-600 text-white px-4 py-2 rounded"
+            onClick={() => router.push("/admin/shipping-methods/create")}
+          >
+            ایجاد روش جدید
+          </button>
+        )}
       </div>
 
-      <ShippingFilters onFilterChange={handleFilterChange} />
+      {hasPermission("shippingmethod", "read") ? (
+        <>
+          <ShippingFilters onFilterChange={handleFilterChange} />
 
-      {loading ? (
-        <p>در حال بارگذاری...</p>
+          {loading ? (
+            <p>در حال بارگذاری...</p>
+          ) : (
+            <ShippingTable
+              methods={methods}
+              page={currentPage}
+              totalCount={totalCount}
+              onPageChange={setCurrentPage}
+              onRequestDelete={(id) =>
+                setSelected(methods.find((m) => m.id === id) || null)
+              }
+            />
+          )}
+
+          {selected && (
+            <DeleteShippingModal
+              method={selected}
+              onCancel={() => setSelected(null)}
+              onConfirm={handleDelete}
+            />
+          )}
+        </>
       ) : (
-        <ShippingTable
-          methods={methods}
-          page={currentPage}
-          totalCount={totalCount}
-          onPageChange={setCurrentPage}
-          onRequestDelete={(id) =>
-            setSelected(methods.find((m) => m.id === id) || null)
-          }
-        />
-      )}
-
-      {selected && (
-        <DeleteShippingModal
-          method={selected}
-          onCancel={() => setSelected(null)}
-          onConfirm={handleDelete}
-        />
+        <p className="text-center py-10 text-red-600">
+          دسترسی به این بخش مجاز نیست.
+        </p>
       )}
     </div>
   );
