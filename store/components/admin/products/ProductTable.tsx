@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { TrashIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
-import {   Product } from "@/services/admin/products/productService";
+import { Product } from "@/services/admin/products/productService";
+import { useAuth } from "@/context/AuthContext";
 
 interface Props {
   products: Product[];
@@ -17,12 +18,6 @@ const STATUS_LABELS: Record<string, string> = {
   published: "منتشر شده",
 };
 
-const AVAILABILITY_LABELS: Record<string, string> = {
-  in_stock: "موجود",
-  out_of_stock: "ناموجود",
-  pre_order: "پیش‌فروش",
-};
-
 export default function ProductTable({
   products,
   page,
@@ -30,6 +25,10 @@ export default function ProductTable({
   onPageChange,
   onRequestDelete,
 }: Props) {
+  const { hasPermission } = useAuth();
+  const canUpdate = hasPermission("product", "update");
+  const canDelete = hasPermission("product", "delete");
+
   const totalPages = Math.ceil(totalCount / 10);
 
   return (
@@ -41,7 +40,7 @@ export default function ProductTable({
             <th className="px-4 py-2">دسته‌بندی</th>
             <th className="px-4 py-2">موجودی</th>
             <th className="px-4 py-2">وضعیت</th>
-            <th className="px-4 py-2">عملیات</th>
+            {(canUpdate || canDelete) && <th className="px-4 py-2">عملیات</th>}
           </tr>
         </thead>
         <tbody>
@@ -51,31 +50,31 @@ export default function ProductTable({
               className="bg-white border border-gray-200 hover:bg-gray-50"
             >
               <td className="px-4 py-2">{product.name}</td>
-              <td className="px-4 py-2">
-                {product.category?.name || "بدون دسته‌بندی"}
-              </td>
-              <td className="px-4 py-2">
-                {product.total_stock || "نامشخص"}
-              </td>
-              <td className="px-4 py-2">
-                {STATUS_LABELS[product.status] || "نامشخص"}
-              </td>
-              <td className="px-4 py-2">
-                <div className="flex gap-2">
-                  <Link
-                    href={`/admin/products/edit/${product.id}`}
-                    className="text-blue-600 hover:text-blue-800"
-                  >
-                    <PencilSquareIcon className="w-5 h-5" />
-                  </Link>
-                  <button
-                    onClick={() => onRequestDelete(product.id)}
-                    className="text-red-600 hover:text-red-800"
-                  >
-                    <TrashIcon className="w-5 h-5" />
-                  </button>
-                </div>
-              </td>
+              <td className="px-4 py-2">{product.category?.name || "بدون دسته‌بندی"}</td>
+              <td className="px-4 py-2">{product.total_stock || "نامشخص"}</td>
+              <td className="px-4 py-2">{STATUS_LABELS[product.status] || "نامشخص"}</td>
+              {(canUpdate || canDelete) && (
+                <td className="px-4 py-2">
+                  <div className="flex gap-2">
+                    {canUpdate && (
+                      <Link
+                        href={`/admin/products/edit/${product.id}`}
+                        className="text-blue-600 hover:text-blue-800"
+                      >
+                        <PencilSquareIcon className="w-5 h-5" />
+                      </Link>
+                    )}
+                    {canDelete && (
+                      <button
+                        onClick={() => onRequestDelete(product.id)}
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        <TrashIcon className="w-5 h-5" />
+                      </button>
+                    )}
+                  </div>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>
