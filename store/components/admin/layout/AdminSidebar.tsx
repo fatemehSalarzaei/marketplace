@@ -78,7 +78,7 @@ export default function AdminSidebarMenu() {
         { label: "لیست محصولات", href: "/admin/products", model: "product" },
         { label: "دسته‌بندی‌ها", href: "/admin/categories", model: "category" },
         { label: "برندها", href: "/admin/brands", model: "brand" },
-        { label: "خصوصیات محصولات", href: "/admin/product-attributes", model: "productattribute" },
+        { label: "خصوصیات محصولات", href: "/admin/product-attributes", model: "attribute" },
       ],
     },
     {

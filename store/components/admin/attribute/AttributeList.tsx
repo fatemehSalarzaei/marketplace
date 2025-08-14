@@ -9,10 +9,12 @@ import AttributeFilters from "./AttributeFilters";
 import AttributeTable from "./AttributeTable";
 import DeleteAttributeModal from "./DeleteAttributeModal ";
 import AttributeForm from "./AttributeForm";
+import { useAuth } from "@/context/AuthContext";
 
 const PAGE_SIZE = 10;
 
 export default function AttributeList() {
+  const { hasPermission } = useAuth();
   const router = useRouter();
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [loading, setLoading] = useState(false);
@@ -24,6 +26,7 @@ export default function AttributeList() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const fetchData = async (page = 1, activeFilters = filters) => {
+    if (!hasPermission("attribute", "read")) return;
     setLoading(true);
     try {
       const response = await getAttributes(page, activeFilters.search);
@@ -36,7 +39,7 @@ export default function AttributeList() {
 
   useEffect(() => {
     fetchData(currentPage, filters);
-  }, [currentPage, filters]);
+  }, [currentPage, filters, hasPermission]);
 
   const handleFilterChange = (newFilters: { search?: string }) => {
     setFilters(newFilters);
@@ -44,7 +47,7 @@ export default function AttributeList() {
   };
 
   const handleDelete = async () => {
-    if (!selectedAttribute) return;
+    if (!selectedAttribute || !hasPermission("attribute", "delete")) return;
     try {
       await deleteAttribute(selectedAttribute.id);
       setDeleteDialogOpen(false);
@@ -55,37 +58,23 @@ export default function AttributeList() {
     }
   };
 
-  const renderPagination = () => {
-    if (totalPages <= 1) return null;
-    return (
-      <div className="flex justify-center mt-4 gap-2 flex-wrap">
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-          <button
-            key={page}
-            onClick={() => setCurrentPage(page)}
-            className={`px-3 py-1 rounded border text-sm ${
-              page === currentPage ? "bg-blue-600 text-white" : "bg-white hover:bg-gray-100"
-            }`}
-          >
-            {page}
-          </button>
-        ))}
-      </div>
-    );
-  };
+  if (!hasPermission("attribute", "read")) {
+    return <p>شما دسترسی مشاهده خصوصیات را ندارید.</p>;
+  }
 
   return (
     <div dir="rtl" className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-bold">لیست خصوصیات</h1>
-        <Button
-          onClick={() => {
-            setSelectedAttribute(null);
-            setOpenForm(true);
-          }}
-        >
-          افزودن خصوصیت
-        </Button>
+      <div className="flex justify-end items-center mb-4 ">
+        {hasPermission("attribute", "create") && (
+          <Button
+            onClick={() => {
+              setSelectedAttribute(null);
+              setOpenForm(true);
+            }}
+          >
+            افزودن خصوصیت
+          </Button>
+        )}
       </div>
 
       <AttributeFilters onFilterChange={handleFilterChange} />
@@ -97,19 +86,36 @@ export default function AttributeList() {
           <AttributeTable
             attributes={attributes}
             onEdit={(attr) => {
-              // 👉 هدایت به صفحه ویرایش
-              router.push(`/admin/product-attributes/${attr.id}`);
+              if (hasPermission("attribute", "update")) {
+                router.push(`/admin/product-attributes/${attr.id}`);
+              }
             }}
             onRequestDelete={(attr) => {
-              setSelectedAttribute(attr);
-              setDeleteDialogOpen(true);
+              if (hasPermission("attribute", "delete")) {
+                setSelectedAttribute(attr);
+                setDeleteDialogOpen(true);
+              }
             }}
           />
-          {renderPagination()}
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-4 gap-2 flex-wrap">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`px-3 py-1 rounded border text-sm ${
+                    page === currentPage ? "bg-blue-600 text-white" : "bg-white hover:bg-gray-100"
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+            </div>
+          )}
         </>
       )}
 
-      {openForm && (
+      {openForm && (hasPermission("attribute", "create") || hasPermission("attribute", "update")) && (
         <AttributeForm
           attribute={selectedAttribute}
           onClose={() => {
@@ -119,7 +125,7 @@ export default function AttributeList() {
         />
       )}
 
-      {deleteDialogOpen && selectedAttribute && (
+      {deleteDialogOpen && selectedAttribute && hasPermission("attribute", "delete") && (
         <DeleteAttributeModal
           attribute={selectedAttribute}
           onCancel={() => setDeleteDialogOpen(false)}

@@ -1,5 +1,6 @@
 import { Attribute } from "@/types/admin/attribute/attribute";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import { useAuth } from "@/context/AuthContext";
 
 interface Props {
   attributes: Attribute[];
@@ -8,10 +9,14 @@ interface Props {
 }
 
 export default function AttributeTable({ attributes, onEdit, onRequestDelete }: Props) {
+  const { hasPermission } = useAuth();
+
+  if (!hasPermission("attribute", "read")) {
+    return <p>شما دسترسی مشاهده خصوصیات را ندارید.</p>;
+  }
+
   if (attributes.length === 0) {
-    return (
-      <p className="text-center py-4">داده‌ای وجود ندارد</p>
-    );
+    return <p className="text-center py-4">داده‌ای وجود ندارد</p>;
   }
 
   return (
@@ -28,7 +33,14 @@ export default function AttributeTable({ attributes, onEdit, onRequestDelete }: 
         <tbody>
           {attributes.map((attr) => (
             <tr key={attr.id} className="hover:bg-gray-50 border-b">
-              <td className="px-4 py-2 cursor-pointer" onClick={() => onEdit(attr)}>{attr.name}</td>
+              <td
+                className={`px-4 py-2 cursor-pointer ${
+                  hasPermission("attribute", "update") ? "hover:underline" : ""
+                }`}
+                onClick={() => hasPermission("attribute", "update") && onEdit(attr)}
+              >
+                {attr.name}
+              </td>
               <td className="px-4 py-2">{attr.slug}</td>
               <td className="px-4 py-2">
                 {Array.isArray(attr.values) && attr.values.length > 0
@@ -36,22 +48,26 @@ export default function AttributeTable({ attributes, onEdit, onRequestDelete }: 
                   : "-"}
               </td>
               <td className="px-4 py-2 flex gap-4 justify-center">
-                <button
-                  onClick={() => onEdit(attr)}
-                  title="ویرایش"
-                  className="text-blue-600 hover:text-blue-800"
-                  aria-label="ویرایش"
-                >
-                  <FaEdit size={18} />
-                </button>
-                <button
-                  onClick={() => onRequestDelete(attr)}
-                  title="حذف"
-                  className="text-red-600 hover:text-red-800"
-                  aria-label="حذف"
-                >
-                  <FaTrash size={18} />
-                </button>
+                {hasPermission("attribute", "update") && (
+                  <button
+                    onClick={() => onEdit(attr)}
+                    title="ویرایش"
+                    className="text-blue-600 hover:text-blue-800"
+                    aria-label="ویرایش"
+                  >
+                    <FaEdit size={18} />
+                  </button>
+                )}
+                {hasPermission("attribute", "delete") && (
+                  <button
+                    onClick={() => onRequestDelete(attr)}
+                    title="حذف"
+                    className="text-red-600 hover:text-red-800"
+                    aria-label="حذف"
+                  >
+                    <FaTrash size={18} />
+                  </button>
+                )}
               </td>
             </tr>
           ))}
