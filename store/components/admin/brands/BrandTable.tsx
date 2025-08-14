@@ -10,6 +10,7 @@ interface Props {
   totalCount: number;
   onPageChange: (page: number) => void;
   onRequestDelete: (id: number) => void;
+  hasPermission: (model: string, action?: "create" | "read" | "update" | "delete") => boolean;
 }
 
 export default function BrandTable({
@@ -18,6 +19,7 @@ export default function BrandTable({
   totalCount,
   onPageChange,
   onRequestDelete,
+  hasPermission,
 }: Props) {
   const totalPages = Math.ceil(totalCount / 10);
   const fallbackLogo = "/images/default-brand.png";
@@ -52,26 +54,26 @@ export default function BrandTable({
               </td>
               <td className="px-4 py-2">{brand.name}</td>
               <td className="px-4 py-2">{brand.website || "-"}</td>
-              <td className="px-4 py-2">
-                {brand.is_active ? "فعال" : "غیرفعال"}
-              </td>
-              <td className="px-4 py-2">
-                {new Date(brand.created_at).toLocaleDateString("fa-IR")}
-              </td>
+              <td className="px-4 py-2">{brand.is_active ? "فعال" : "غیرفعال"}</td>
+              <td className="px-4 py-2">{new Date(brand.created_at).toLocaleDateString("fa-IR")}</td>
               <td className="px-4 py-2">
                 <div className="flex gap-2">
-                  <Link
-                    href={`/admin/brands/${brand.id}/edit`}
-                    className="text-blue-600 hover:text-blue-800"
-                  >
-                    <PencilSquareIcon className="w-5 h-5" />
-                  </Link>
-                  <button
-                    className="text-red-600 hover:text-red-800"
-                    onClick={() => onRequestDelete(brand.id)}
-                  >
-                    <TrashIcon className="w-5 h-5" />
-                  </button>
+                  {hasPermission("brand", "update") && (
+                    <Link
+                      href={`/admin/brands/${brand.id}/edit`}
+                      className="text-blue-600 hover:text-blue-800"
+                    >
+                      <PencilSquareIcon className="w-5 h-5" />
+                    </Link>
+                  )}
+                  {hasPermission("brand", "delete") && (
+                    <button
+                      className="text-red-600 hover:text-red-800"
+                      onClick={() => onRequestDelete(brand.id)}
+                    >
+                      <TrashIcon className="w-5 h-5" />
+                    </button>
+                  )}
                 </div>
               </td>
             </tr>
